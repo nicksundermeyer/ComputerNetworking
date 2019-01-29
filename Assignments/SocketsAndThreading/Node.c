@@ -5,16 +5,17 @@
 //#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netdb.h>
 #include "duSocket.h"
 
 int main() {
 
-
-  // Get a socket of the right type
-  int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  // Socket pointer
+  int sockfd;
+  sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) {
-    printf("ERROR opening socket");
-    exit(1);
+    fprintf(stderr,"ERROR opening socket\n");
+    exit(0);
   }
 
   // port number
@@ -29,55 +30,48 @@ int main() {
   // Setup the type of socket (internet vs filesystem)
   serv_addr.sin_family = AF_INET;
 
-  // Basically the machine we are on...
-  serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-  // Setup the port number
+   // Setup the port number
   // htons - is host to network byte order
-  // network byte order is most sig bype first
+  // network byte order is most sig byte first
   //   which might be host or might not be
   serv_addr.sin_port = htons(portno);
 
-  // Bind the socket to the given port
-  if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-    printf("ERROR on binding\n");
-    exit(1);
+
+  // Setup the server host address
+  struct hostent *server;
+  server = gethostbyname("localhost");
+  if (server == NULL) {
+    fprintf(stderr,"ERROR, no such host\n");
+    exit(0);
   }
+  memcpy(&serv_addr.sin_addr.s_addr, server->h_addr, server->h_length);  /// dest, src, size
 
-  // set it up to listen
-  listen(sockfd,5);
-  
-
-  int newsockfd;
-  struct sockaddr_in cli_addr;
-  socklen_t clilen = sizeof(cli_addr);
-
-  // Wait for a call
-  printf("waiting for a call...\n");
-  newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-  printf("connected\n");
-  if (newsockfd < 0) {
-    printf("ERROR on accept");
-    exit(1);
+  // Connect to the server
+  if (connect(sockfd,(struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+    printf("ERROR connecting\n");
+    exit(0);
   }
 
   char buffer[256];
-  memset(&buffer, '\0', 256);
-  //  bzero(buffer,256);
-  int n = read(newsockfd,buffer,255);
-  if (n < 0) {
-    printf("ERROR reading from socket\n");
-    exit(1);
-  }
+  printf("Please enter the message: ");
+  memset(&buffer, '\0', 256); 
+  fgets(buffer,255,stdin);
 
-  printf("Here is the message: %s\n",buffer);
-  n = write(newsockfd,"I got your message",18);
+  int n = write(sockfd,buffer,strlen(buffer));
   if (n < 0) {
     printf("ERROR writing to socket\n");
-    exit(1);
+    exit(0);
   }
 
-  close(newsockfd);
+  memset(&buffer, '\0', 256);
+  n = read(sockfd,buffer,255);
+  if (n < 0) {
+    printf("ERROR reading from socket\n");
+    exit(0);
+  }
+  printf("%s\n",buffer);
+
   close(sockfd);
   return 0;
+
 }
