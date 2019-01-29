@@ -1,0 +1,82 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Head",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/head",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "setupCommands": [
+                {
+                    "text": "-enable-pretty-printing"
+                }
+            ]
+        },
+        {
+            "name": "Node1",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/node",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "setupCommands": [
+                {
+                    "text": "-enable-pretty-printing"
+                }
+            ]
+        },
+        {
+            "name": "Node2",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/node",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "setupCommands": [
+                {
+                    "text": "-enable-pretty-printing"
+                }
+            ]
+        },
+        {
+            "name": "Node3",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/node",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "setupCommands": [
+                {
+                    "text": "-enable-pretty-printing"
+                }
+            ]
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Head+Nodes",
+            "configurations": ["Head", "Node1", "Node2", "Node3"]
+        }
+    ]
+}

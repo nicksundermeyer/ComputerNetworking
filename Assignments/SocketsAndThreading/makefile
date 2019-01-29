@@ -3,13 +3,13 @@ all: Head.c Node.c duSocket.c duSocket.h
 	make node
 
 head: Head.c duSocket.c
-	gcc -c Head.c -o Head.o
-	gcc -c duSocket.c -o duSocket.o
-	gcc Head.o duSocket.o -o head
-	gcc Head.o duSocket.o -o head.exe
+	clang -c Head.c -g -o Head.o
+	clang -c duSocket.c -g -o duSocket.o
+	clang Head.o duSocket.o -g -o head
+	clang Head.o duSocket.o -g -o head.exe
 
 node: Node.c duSocket.c
-	gcc -c Node.c -o Node.o
-	gcc -c duSocket.c -o duSocket.o
-	gcc Node.o duSocket.o -o node
-	gcc Node.o duSocket.o -o node.exe
+	clang -c Node.c -g -o Node.o
+	clang -c duSocket.c -g -o duSocket.o
+	clang Node.o duSocket.o -g -o node
+	clang Node.o duSocket.o -g -o node.exe

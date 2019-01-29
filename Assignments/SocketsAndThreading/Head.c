@@ -6,10 +6,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include "duSocket.h"
-#include <omp.h>
+// #include <omp.h>
 
 int main() {
-
   int connections = 3;
   int connected = 0;
   int sockets[connections];
@@ -19,8 +18,6 @@ int main() {
   // set it up to listen
   listen(sockfd,5);
 
-  sockets[0] = serverSocketAccept(sockfd);
-
   while(connected < connections)
   {
     printf("start");
@@ -28,16 +25,13 @@ int main() {
     connected++;
     printf("Accepted: %d/%d\n", connected, connections);
   }
-  
-  printf("All connected");
 
   for(int i=0; i<sizeof(sockets); i++)
   {
-    char buffer[256];
-    memset(&buffer, '\0', 256);
-    //  bzero(buffer,256);
+    int buffer = 0;
+    // bzero(buffer,256);
 
-    int n = read(sockets[i],buffer,255);
+    int n = read(sockets[i],buffer,sizeof(int));
     printf("%d\n", n);
     if (n < 0) {
       printf("ERROR reading from socket\n");

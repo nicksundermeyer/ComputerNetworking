@@ -32,24 +32,19 @@ int main() {
 
   printf("Result: %d\n", result);
 
-  int buffer[4];
-  // printf("Please enter the message: ");
-  memset(&buffer, '\0', result); 
-  // fgets(buffer,255,result);
-
-  int n = write(sockfd,buffer,4);
+  int n = write(sockfd,&result,sizeof(int));
   if (n < 0) {
     printf("ERROR writing to socket\n");
     exit(0);
   }
 
-  memset(&buffer, '\0', 256);
-  n = read(sockfd,buffer,255);
+  memset(&result, '\0', sizeof(int));
+  n = read(sockfd,result,255);
   if (n < 0) {
     printf("ERROR reading from socket\n");
     exit(0);
   }
-  printf("%s\n",buffer);
+  // printf("%d\n",result);
 
   close(sockfd);
   return 0;
