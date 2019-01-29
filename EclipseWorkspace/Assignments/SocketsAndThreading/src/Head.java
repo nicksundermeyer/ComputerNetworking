@@ -2,7 +2,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Timer;
+import java.util.Date;
 
 public class Head {
     static private int connections = 4;
@@ -36,7 +36,7 @@ public class Head {
             int rangePerNode = (end - start) / connections;
 
             System.out.println("All nodes connected, starting timer");
-            startTime = System.currentTimeMillis();
+            long StartTime = new Date().getTime();
             int result = 0;
 
             // starting all threads
@@ -68,10 +68,12 @@ public class Head {
                 result += (int)oisArray[i].readObject();
             }
 
+            long EndTime = new Date().getTime();
             System.out.println("Result: " + result);
-            System.out.println("Total time: " + ((System.currentTimeMillis()-startTime) * 0.001) + " Seconds");
+            System.out.println("Total time: " + (EndTime-StartTime)*0.001 + " Seconds");
 
             // Total time unthreaded: 131.072 seconds
+            // Total time threaded: 77.877 seconds
 
         } catch (Exception e) {
             e.printStackTrace();
