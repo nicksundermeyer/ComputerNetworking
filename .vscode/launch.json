@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
         {
             "type": "java",
             "name": "Debug (Launch) - Current File",
@@ -40,6 +41,13 @@
         },
         {
             "type": "java",
+            "name": "Node4<SocketsAndThreading>",
+            "request": "launch",
+            "mainClass": "Node",
+            "projectName": "SocketsAndThreading"
+        },
+        {
+            "type": "java",
             "name": "Client<Sockets>",
             "request": "launch",
             "mainClass": "Client",
@@ -63,7 +71,7 @@
     "compounds": [
         {
             "name": "Nodes",
-            "configurations": ["Node1<SocketsAndThreading>", "Node2<SocketsAndThreading>", "Node3<SocketsAndThreading>"]
+            "configurations": ["Node1<SocketsAndThreading>", "Node2<SocketsAndThreading>", "Node3<SocketsAndThreading>", "Node4<SocketsAndThreading>"]
         }
     ]
 }

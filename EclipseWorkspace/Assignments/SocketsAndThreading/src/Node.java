@@ -5,26 +5,43 @@ import java.net.Socket;
 public class Node {
     public static void main(String[] args) throws Exception {
         System.out.println("About to call");
-        Socket s = new Socket("localhost",7000);
+
+        boolean connected = false;
+        Socket s = new Socket();
+        while (!connected) {
+            try {
+                s = new Socket("localhost", 7000);
+                connected = true;
+            } catch (Exception e) {
+                System.out.println("Trying connection again");
+            }
+        }
+
         System.out.println("Connected.");
 
         ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
         ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
-        oos.writeObject(5);
 
-        int start=0, end=0, result=0;
+        int[] vals = (int[]) ois.readObject();
+
+        int start = vals[0], end = vals[1], result = 0;
+        System.out.println("Start: " + start + " " + "End: " + end);
 
         // find number of primes between to numbers
-        for(int i=start; i<= end; i++) {
-            boolean prime = true;  //start by assuming the current number is prime
-            for(int j=2; j<i; j++) { // Loop till j < i
-                if(i%j == 0) {
-                  prime = false; //Set the current number as not prime if it is divisible by any number lesser than it
+        for (int i = start; i <= end; i++) {
+            boolean prime = true; // start by assuming the current number is prime
+            for (int j = 2; j < i; j++) { // Loop till j < i
+                if (i % j == 0) {
+                    prime = false;
+                    break;
                 }
-           }
-           if (prime) {
-               result += 1;   //Add to result
-           }
+            }
+            if (prime) {
+                result += 1; // Add to result
+            }
         }
+
+        System.out.println("Result: " + result);
+        oos.writeObject(result);
     }
 }
