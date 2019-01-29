@@ -14,18 +14,7 @@ int main() {
   // set it up to listen
   listen(sockfd,5);
 
-  int newsockfd;
-  struct sockaddr_in cli_addr;
-  socklen_t clilen = sizeof(cli_addr);
-
-  // Wait for a call
-  printf("waiting for a call...\n");
-  newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-  printf("connected\n");
-  if (newsockfd < 0) {
-    printf("ERROR on accept");
-    exit(1);
-  }
+  int newsockfd = serverSocketAccept(sockfd);
 
   char buffer[256];
   memset(&buffer, '\0', 256);

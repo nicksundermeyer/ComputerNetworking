@@ -5,6 +5,7 @@
 //#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netdb.h>
 
 int setupServerSocket(int portno); // Like new ServerSocket in Java
 int callServer(char* host, int portno); // Like new Socket in Java
