@@ -6,18 +6,38 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <stdbool.h>
 #include "duSocket.h"
 
 int main() {
 
   int sockfd = callServer("localhost", 7000);
 
-  char buffer[256];
-  printf("Please enter the message: ");
-  memset(&buffer, '\0', 256); 
-  fgets(buffer,255,stdin);
+  int result = 0;
+  int start = 1000;
+  int end = 10000;
 
-  int n = write(sockfd,buffer,strlen(buffer));
+  for (int i = start; i <= end; i++) {
+    int prime = 1; // start by assuming the current number is prime
+    for (int j = 2; j < i; j++) { // Loop till j < i
+        if (i % j == 0) {
+            prime = 0;
+            break;
+        }
+    }
+    if (prime == 1) {
+        result += 1; // Add to result
+    }
+  }
+
+  printf("Result: %d\n", result);
+
+  int buffer[4];
+  // printf("Please enter the message: ");
+  memset(&buffer, '\0', result); 
+  // fgets(buffer,255,result);
+
+  int n = write(sockfd,buffer,4);
   if (n < 0) {
     printf("ERROR writing to socket\n");
     exit(0);
