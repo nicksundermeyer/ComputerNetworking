@@ -2,12 +2,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class Node {
-    public static void main(String[] args) throws Exception {
+public class Node implements Runnable {
+
+    private Socket s;
+
+    public Node() {
         System.out.println("About to call");
 
         boolean connected = false;
-        Socket s = new Socket();
+        s = new Socket();
         while (!connected) {
             try {
                 s = new Socket("localhost", 7000);
@@ -17,31 +20,39 @@ public class Node {
             }
         }
 
-        System.out.println("Connected.");
+        System.out.println("Connected: " + s.getPort());
+    }
 
-        ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
-        ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
+    @Override
+    public void run() {
 
-        int[] vals = (int[]) ois.readObject();
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
+            ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
 
-        int start = vals[0], end = vals[1], result = 0;
-        System.out.println("Start: " + start + " " + "End: " + end);
+            int[] vals = (int[]) ois.readObject();
 
-        // find number of primes between to numbers
-        for (int i = start; i <= end; i++) {
-            boolean prime = true; // start by assuming the current number is prime
-            for (int j = 2; j < i; j++) { // Loop till j < i
-                if (i % j == 0) {
-                    prime = false;
-                    break;
+            int start = vals[0], end = vals[1], result = 0;
+            System.out.println("Start: " + start + " " + "End: " + end);
+
+            // find number of primes between to numbers
+            for (int i = start; i <= end; i++) {
+                boolean prime = true; // start by assuming the current number is prime
+                for (int j = 2; j < i; j++) { // Loop till j < i
+                    if (i % j == 0) {
+                        prime = false;
+                        break;
+                    }
+                }
+                if (prime) {
+                    result += 1; // Add to result
                 }
             }
-            if (prime) {
-                result += 1; // Add to result
-            }
-        }
 
-        System.out.println("Result: " + result);
-        oos.writeObject(result);
+            System.out.println("Result: " + result);
+            oos.writeObject(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
