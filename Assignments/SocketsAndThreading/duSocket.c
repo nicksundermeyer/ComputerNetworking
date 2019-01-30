@@ -1,5 +1,7 @@
 #include "duSocket.h"
 
+void Node();
+
 // Like new ServerSocket in Java
 int setupServerSocket(int portno)
 {
@@ -103,13 +105,21 @@ int serverSocketAccept(int serverSocket)
 // Write an int over the given socket
 void writeInt(int x, int socket)
 {
-    write(socket, &x, sizeof(x));
+    int n = write(socket, &x, sizeof(x));
+    if (n < 0) {
+      printf("ERROR writing to socket\n");
+      exit(1);
+    }
 }
 
 // Read an int from the given socket
 int readInt(int socket)
 {
     int buffer;
-    read(socket, &buffer, sizeof(int));
-    return 0;
+    int n = read(socket, &buffer, sizeof(int));
+    if(n < 0){
+      printf("Error - unable to read from socket!\n");
+      exit(0);
+    }
+    return buffer;
 }

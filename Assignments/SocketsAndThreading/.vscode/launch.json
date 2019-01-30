@@ -22,6 +22,23 @@
             ]
         },
         {
+            "name": "Outer",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/nested",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "setupCommands": [
+                {
+                    "text": "-enable-pretty-printing"
+                }
+            ]
+        },
+        {
             "name": "Node1",
             "type": "cppdbg",
             "request": "launch",
@@ -75,8 +92,8 @@
     ],
     "compounds": [
         {
-            "name": "Head+Nodes",
-            "configurations": ["Head", "Node1", "Node2", "Node3"]
+            "name": "Nodes",
+            "configurations": ["Node1", "Node2", "Node3"]
         }
     ]
 }

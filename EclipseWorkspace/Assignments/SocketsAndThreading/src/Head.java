@@ -15,10 +15,13 @@ public class Head {
             int connected = 0;
             ths = new Thread[connections];
 
+            // array of connected sockets
             Socket[] sockets = new Socket[connections];
 
+            // setting up serversocket
             ServerSocket ss = new ServerSocket(7000);
 
+            // waiting for connections and threads for each connected socket
             while (connected < connections) {
                 Node n = new Node();
 
@@ -33,6 +36,7 @@ public class Head {
                 System.out.println("Accepted: " + connected);
             }
 
+            // calculating range for each node
             int rangePerNode = (end - start) / connections;
 
             System.out.println("All nodes connected, starting timer");
@@ -45,6 +49,7 @@ public class Head {
                 ths[i].start();
             }
 
+            // writing ranges to connected sockets
             ObjectInputStream[] oisArray = new ObjectInputStream[connections];
             for (int i = 0; i < sockets.length; i++) {
                 ObjectInputStream ois = new ObjectInputStream(sockets[i].getInputStream());
@@ -53,6 +58,7 @@ public class Head {
                 oisArray[i] = ois;
             }
 
+            // join all threads to make sure everything has finished
             for (int i = 0; i < 4; i++) {
                 try {
                     ths[i].join();
@@ -63,6 +69,7 @@ public class Head {
 
             System.out.println("All threads complete");
 
+            // calculate total result
             for(int i=0; i<oisArray.length; i++)
             {
                 result += (int)oisArray[i].readObject();

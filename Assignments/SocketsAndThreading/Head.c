@@ -6,8 +6,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <time.h>
+#include <omp.h>
+#include <pthread.h>
 #include "duSocket.h"
-// #include <omp.h>
 
 int main() {
   int start = 1000;
@@ -22,6 +23,7 @@ int main() {
   // set it up to listen
   listen(sockfd,5);
 
+  // wait for all socket connections
   while(connected < connections)
   {
     sockets[connected] = serverSocketAccept(sockfd);
@@ -29,35 +31,22 @@ int main() {
     printf("Accepted: %d/%d\n", connected, connections);
   }
 
+  // split range among connections
   int rangePerNode = (end - start) / connections;
   int result = 0;
   time_t startTime = time(0);
 
+  // write to sockets
   for(int i=0; i<connections; i++)
   {
-    int buffer = 0;
+    writeInt(start+(i*rangePerNode), sockets[i]);
+    writeInt((start + ((i+1)*rangePerNode)-1), sockets[i]);
+  }
 
-    int startEnd[2] = {start+(i*rangePerNode), (start + ((i+1)*rangePerNode)-1)};
-    int n = write(sockets[i], &startEnd, sizeof(startEnd));
-    if(n < 0)
-    {
-      printf("ERROR writing startEnd to socket\n");
-      exit(0);
-    }
-
-    n = read(sockets[i],&buffer,sizeof(int));
-    if (n < 0) {
-      printf("ERROR reading from socket\n");
-      exit(1);
-    }
-
-    // printf("Value: %d\n",buffer);
-    n = write(sockets[i],"I got your message",18);
-    if (n < 0) {
-      printf("ERROR writing to socket\n");
-      exit(1);
-    }
-
+  // read from sockets
+  for(int i=0; i<connections; i++)
+  {
+    int buffer = readInt(sockets[i]);
     result += buffer;
   }
   
