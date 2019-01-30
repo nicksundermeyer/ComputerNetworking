@@ -5,12 +5,13 @@
 //#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <time.h>
 #include "duSocket.h"
 // #include <omp.h>
 
 int main() {
   int start = 1000;
-  int end = 10000;
+  int end = 1000000;
 
   int connections = 3;
   int connected = 0;
@@ -23,7 +24,6 @@ int main() {
 
   while(connected < connections)
   {
-    printf("start");
     sockets[connected] = serverSocketAccept(sockfd);
     connected++;
     printf("Accepted: %d/%d\n", connected, connections);
@@ -31,6 +31,7 @@ int main() {
 
   int rangePerNode = (end - start) / connections;
   int result = 0;
+  time_t startTime = time(0);
 
   for(int i=0; i<connections; i++)
   {
@@ -59,8 +60,11 @@ int main() {
 
     result += buffer;
   }
+  
+  time_t endTime = time(0);
 
   printf("Result: %d\n", result);
+  printf("Time taken: %ld Seconds\n", (endTime-startTime));
 
   // closing all sockets
   for(int i=0; i<sizeof(sockets); i++)

@@ -40,11 +40,6 @@ int main() {
   }
 
   memset(&result, '\0', sizeof(int));
-  n = read(sockfd,result,sizeof(int));
-  if (n < 0) {
-    printf("ERROR reading from socket\n");
-    exit(0);
-  }
 
   close(sockfd);
   return 0;

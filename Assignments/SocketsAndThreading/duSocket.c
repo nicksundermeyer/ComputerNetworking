@@ -103,11 +103,13 @@ int serverSocketAccept(int serverSocket)
 // Write an int over the given socket
 void writeInt(int x, int socket)
 {
-    
+    write(socket, &x, sizeof(x));
 }
 
 // Read an int from the given socket
 int readInt(int socket)
 {
+    int buffer;
+    read(socket, &buffer, sizeof(int));
     return 0;
 }
