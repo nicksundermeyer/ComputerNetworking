@@ -9,6 +9,7 @@ int main() {
   char buffer[MAXLINE]; 
   char *data = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec facilisis sollicitudin mauris dignissim viverra. Phasellus euismod tellus sit amet arcu gravida, sit amet bibendum felis fringilla. Pellentesque magna velit, vulputate et pellentesque quis, laoreet non ante. Etiam mollis tempor ultrices. Proin tempus volutpat justo, vel scelerisque ligula gravida vitae. Etiam purus ipsum, venenatis vel dui sed, dapibus pharetra est. Aliquam ac ipsum in neque porttitor rhoncus a non metus. Etiam sit amet suscipit turpis, ut pretium purus. Proin euismod volutpat orci eu ultricies. Vestibulum vel diam urna. Sed placerat id enim et ultricies. Integer at vulputate velit. Vivamus mattis bibendum libero, a luctus orci dapibus sit amet. Phasellus accumsan gravida purus. Quisque sit amet efficitur eros.";
   struct sockaddr_in servaddr; 
+  // makePacket("0", data);
 
   // Creating socket file descriptor
   // Last parameter could be IPPROTO_UDP but that is what it will pick anyway with 0
@@ -56,8 +57,12 @@ int main() {
   return 0; 
 } 
 
-char* makePacket(int seq, char* data) {
-  
+char* makePacket(char* seq, char* data) {
+  char* result;
+
+  strcat(seq, result);
+  strcat(data, result);
+  printf("%d\n", result);
 }
 
 char checkSum(char* data) {

@@ -1,11 +1,11 @@
-all: UDPclient.c UDPserver.c
+all: UDPclient.cpp UDPserver.cpp
 	make client
 	make server
 
-client: UDPclient.c UDPclient.h
-	gcc-8 -c UDPclient.c -fopenmp -g -o UDPclient.o
+client: UDPclient.cpp UDPclient.h
+	gcc-8 -c UDPclient.cpp -fopenmp -g -o UDPclient.o
 	gcc-8 UDPclient.o -L. -fopenmp -g -o client
 
-server: UDPserver.c
-	gcc-8 -c UDPserver.c -fopenmp -g -o UDPserver.o
+server: UDPserver.cpp
+	gcc-8 -c UDPserver.cpp -fopenmp -g -o UDPserver.o
 	gcc-8 UDPserver.o -L. -fopenmp -g -o server
