@@ -17,7 +17,7 @@
 int main() { 
   int sockfd; 
   char buffer[MAXLINE]; 
-  char *hello = "Hello from client"; 
+  char *data = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec facilisis sollicitudin mauris dignissim viverra. Phasellus euismod tellus sit amet arcu gravida, sit amet bibendum felis fringilla. Pellentesque magna velit, vulputate et pellentesque quis, laoreet non ante. Etiam mollis tempor ultrices. Proin tempus volutpat justo, vel scelerisque ligula gravida vitae. Etiam purus ipsum, venenatis vel dui sed, dapibus pharetra est. Aliquam ac ipsum in neque porttitor rhoncus a non metus. Etiam sit amet suscipit turpis, ut pretium purus. Proin euismod volutpat orci eu ultricies. Vestibulum vel diam urna. Sed placerat id enim et ultricies. Integer at vulputate velit. Vivamus mattis bibendum libero, a luctus orci dapibus sit amet. Phasellus accumsan gravida purus. Quisque sit amet efficitur eros.";
   struct sockaddr_in servaddr; 
 
   // Creating socket file descriptor
@@ -49,7 +49,7 @@ int main() {
   unsigned int len = sizeof(servaddr); 
   
   // 4th parameter is for flags - 0 is fine for these examples
-  sendto(sockfd, (const char *)hello, strlen(hello), 
+  sendto(sockfd, (const char *)data, strlen(data), 
 	 0, (struct sockaddr *) &servaddr, sizeof(servaddr)); 
   printf("Hello message sent to server.\n"); 
   printf("%x: %x\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
@@ -65,3 +65,7 @@ int main() {
   close(sockfd); 
   return 0; 
 } 
+
+char* makePacket(char* data) {
+
+}
