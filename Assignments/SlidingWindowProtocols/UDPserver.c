@@ -1,12 +1,5 @@
 // Server side implementation of UDP client-server model 
-#include <stdio.h> 
-#include <stdlib.h> 
-#include <unistd.h> 
-#include <string.h> 
-#include <sys/types.h> 
-#include <sys/socket.h> 
-#include <arpa/inet.h> 
-#include <netinet/in.h> 
+#include "UDPserver.h"
 
 #define PORT 7000
 #define MAXLINE 1024 
@@ -15,7 +8,6 @@
 int main() { 
   int sockfd; 
   char buffer[MAXLINE]; 
-  char *hello = "Hello from server"; 
   struct sockaddr_in servaddr, cliaddr; 
   
   // Creating socket file descriptor 
@@ -56,10 +48,38 @@ int main() {
     
     printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
     
-    sendto(sockfd, (const char *)hello, strlen(hello), 
+    sendto(sockfd, (const char *)("1"), 1, 
 	   0, (struct sockaddr *) &cliaddr, len); // len is sizeof(cliaddr) from above
     printf("Hello message sent to client.\n"); 
   }
 
   return 0; 
 } 
+
+int verifyChecksum(unsigned char testSum, unsigned char* data) {
+  // take data and recalculate checksum
+  uint16_t sum = 0;
+
+  // add to checksum
+  for(int i = 0; i < strlen(data); i++)
+  {
+    sum += data[i];
+  }
+
+  // deal with overflow to fit into single char
+  char checksum = 0xff;
+  checksum = checksum & sum;
+  checksum += sum >> 8;
+
+  checksum =~ checksum;
+
+  // compare calculated checksum with incoming checksum
+  if(checksum == testSum)
+  {
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+}
