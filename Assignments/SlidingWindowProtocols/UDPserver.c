@@ -56,25 +56,24 @@ int main() {
   return 0; 
 } 
 
-int verifyChecksum(unsigned char testSum, unsigned char* data) {
-  // take data and recalculate checksum
-  uint16_t sum = 0;
+int verifyChecksum(uint16_t testSum, unsigned char* data) {
+  uint32_t sum = 0;
 
   // add to checksum
   for(int i = 0; i < strlen(data); i++)
   {
     sum += data[i];
+
+    // deal with overflow
+    sum += sum >> 16;
   }
 
-  // deal with overflow to fit into single char
-  char checksum = 0xff;
-  checksum = checksum & sum;
-  checksum += sum >> 8;
-
-  checksum =~ checksum;
+  // checksum =~ checksum;
+  sum =~ sum;
+  return sum;
 
   // compare calculated checksum with incoming checksum
-  if(checksum == testSum)
+  if(sum == testSum)
   {
     return 1;
   }

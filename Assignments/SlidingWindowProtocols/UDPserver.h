@@ -7,4 +7,4 @@
 #include <arpa/inet.h> 
 #include <netinet/in.h> 
 
-int verifyChecksum(unsigned char testSum, unsigned char* data);
+int verifyChecksum(uint16_t testSum, unsigned char* data);

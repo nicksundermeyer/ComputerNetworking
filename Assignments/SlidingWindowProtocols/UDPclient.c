@@ -58,8 +58,8 @@ int main() {
 } 
 
 unsigned char* makePacket(unsigned char* seq, unsigned char* data) {
-  unsigned char checksum = checkSum(data);
-  unsigned char result[23];
+  uint16_t checksum = checkSum(data);
+  unsigned char result[24];
 
   memcpy(result, seq, strlen(seq));
   memcpy(result+strlen(seq), &checksum, sizeof(checksum));
@@ -70,22 +70,21 @@ unsigned char* makePacket(unsigned char* seq, unsigned char* data) {
   return(ret);
 }
 
-unsigned char checkSum(unsigned char* data) {
-  uint16_t sum = 0;
+uint16_t checkSum(unsigned char* data) {
+  uint32_t sum = 0;
 
   // add to checksum
   for(int i = 0; i < strlen(data); i++)
   {
     sum += data[i];
+
+    // deal with overflow
+    sum += sum >> 16;
   }
 
-  // deal with overflow to fit into single char
-  char checksum = 0xff;
-  checksum = checksum & sum;
-  checksum += sum >> 8;
-
-  checksum =~ checksum;
-  return checksum;
+  // checksum =~ checksum;
+  sum =~ sum;
+  return sum;
 }
 
 void print_char(char x)

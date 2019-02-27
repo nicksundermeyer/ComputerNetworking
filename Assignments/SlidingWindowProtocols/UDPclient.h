@@ -10,6 +10,6 @@
 #include <netdb.h> // gethostbyname - IPv4
 
 unsigned char* makePacket(unsigned char* seq, unsigned char* data);
-unsigned char checkSum(unsigned char* data);
+uint16_t checkSum(unsigned char* data);
 void print_char(char x);
 void print_int(uint16_t x);
