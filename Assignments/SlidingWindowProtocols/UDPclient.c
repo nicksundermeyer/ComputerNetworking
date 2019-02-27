@@ -6,10 +6,10 @@
 // Driver code 
 int main() { 
   int sockfd; 
-  char buffer[MAXLINE]; 
-  char *data = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec facilisis sollicitudin mauris dignissim viverra. Phasellus euismod tellus sit amet arcu gravida, sit amet bibendum felis fringilla. Pellentesque magna velit, vulputate et pellentesque quis, laoreet non ante. Etiam mollis tempor ultrices. Proin tempus volutpat justo, vel scelerisque ligula gravida vitae. Etiam purus ipsum, venenatis vel dui sed, dapibus pharetra est. Aliquam ac ipsum in neque porttitor rhoncus a non metus. Etiam sit amet suscipit turpis, ut pretium purus. Proin euismod volutpat orci eu ultricies. Vestibulum vel diam urna. Sed placerat id enim et ultricies. Integer at vulputate velit. Vivamus mattis bibendum libero, a luctus orci dapibus sit amet. Phasellus accumsan gravida purus. Quisque sit amet efficitur eros.";
+  unsigned char buffer[MAXLINE]; 
+  unsigned char *data = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec facilisis sollicitudin mauris dignissim viverra. Phasellus euismod tellus sit amet arcu gravida, sit amet bibendum felis fringilla. Pellentesque magna velit, vulputate et pellentesque quis, laoreet non ante. Etiam mollis tempor ultrices. Proin tempus volutpat justo, vel scelerisque ligula gravida vitae. Etiam purus ipsum, venenatis vel dui sed, dapibus pharetra est. Aliquam ac ipsum in neque porttitor rhoncus a non metus. Etiam sit amet suscipit turpis, ut pretium purus. Proin euismod volutpat orci eu ultricies. Vestibulum vel diam urna. Sed placerat id enim et ultricies. Integer at vulputate velit. Vivamus mattis bibendum libero, a luctus orci dapibus sit amet. Phasellus accumsan gravida purus. Quisque sit amet efficitur eros.";
   struct sockaddr_in servaddr; 
-  makePacket("0", "Lorem ipsum dolor si");
+  unsigned char* pack = makePacket("0", "Lorem ipsum dolor si");
 
   // Creating socket file descriptor
   // Last parameter could be IPPROTO_UDP but that is what it will pick anyway with 0
@@ -25,7 +25,7 @@ int main() {
   servaddr.sin_port = htons(PORT); 
 
   // Setup the server host address
-  char* host="localhost";
+  unsigned char* host="localhost";
   //  char* host="linux2.cs.du.edu";
 
   struct hostent *server;
@@ -57,25 +57,51 @@ int main() {
   return 0; 
 } 
 
-char* makePacket(char* seq, char* data) {
-  char checksum = checkSum(data);
-  char result[50];
+unsigned char* makePacket(unsigned char* seq, unsigned char* data) {
+  unsigned char checksum = checkSum(data);
+  unsigned char result[23];
 
-  strcpy(result, seq);
-  // strcat(result, checksum);
-  strcat(result, data);
+  memcpy(result, seq, strlen(seq));
+  memcpy(result+strlen(seq), &checksum, sizeof(checksum));
+  memcpy(result+sizeof(checksum)+strlen(seq), data, strlen(data));
 
-  printf("%s\n", result);
+  unsigned char* ret = result;
 
-  return(result);
+  return(ret);
 }
 
-char checkSum(char* data) {
-  char checksum = 0;
+unsigned char checkSum(unsigned char* data) {
+  uint16_t sum = 0;
+
+  // add to checksum
   for(int i = 0; i < strlen(data); i++)
   {
-    checksum += data[i];
+    sum += data[i];
   }
+
+  // deal with overflow to fit into single char
+  char checksum = 0xff;
+  checksum = checksum & sum;
+  checksum += sum >> 8;
+
   checksum =~ checksum;
   return checksum;
+}
+
+void print_char(char x)
+{
+    for (int i = 0; i < 8; i++) {
+        printf("%d", (x & 0x8000) >> 15);
+        x <<= 1;
+    }
+    printf("\n");
+}
+
+void print_int(uint16_t x)
+{
+    for (int i = 0; i < 16; i++) {
+        printf("%d", (x & 0x8000) >> 15);
+        x <<= 1;
+    }
+    printf("\n");
 }

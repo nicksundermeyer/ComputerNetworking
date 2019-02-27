@@ -9,5 +9,7 @@
 #include <netinet/in.h> 
 #include <netdb.h> // gethostbyname - IPv4
 
-char* makePacket(char* seq, char* data);
-char checkSum(char* data);
+unsigned char* makePacket(unsigned char* seq, unsigned char* data);
+unsigned char checkSum(unsigned char* data);
+void print_char(char x);
+void print_int(uint16_t x);
