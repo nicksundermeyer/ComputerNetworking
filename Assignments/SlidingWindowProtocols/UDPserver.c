@@ -32,6 +32,9 @@ int main() {
     } 
   printf("bound to: %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
 
+  FILE *fp = fopen("fileOut", "w");
+
+  // loop to continue waiting for packets
   while(1) {
     printf("Server ready\n"); 
     
@@ -41,10 +44,15 @@ int main() {
     // Receive on the socket
     // Get the message sent and
     // get the client address that it was sent from
-    n = recvfrom(sockfd, (char *)buffer, MAXLINE, 
-		 0, (struct sockaddr *) &cliaddr, &len); 
+    n = recvfrom(sockfd, (char *)buffer, MAXLINE, 0, (struct sockaddr *) &cliaddr, &len);
+
+    if(buffer[0] == '\0')
+    {
+      break;
+    }
+
     buffer[n] = '\0'; // Make sure string is null terminated
-    printf("Received from client: %s\n", buffer); 
+    printf("Received from client: %s\n", buffer);
     // printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
 
     // copy information out of buffer
@@ -54,7 +62,7 @@ int main() {
     memcpy(&checkSum, buffer+1, 2);
 
     char * data;
-    memcpy(data, buffer+3, 20);
+    memcpy(data, buffer+3, 21);
 
     // verify checksum is correct
     int correct = verifyChecksum(checkSum, data);
@@ -67,11 +75,16 @@ int main() {
       sendto(sockfd, (const char *)("1"), 1, 
       0, (struct sockaddr *) &cliaddr, len); // len is sizeof(cliaddr) from above
       printf("ACK sent to client\n"); 
+
+      // write data to file
+      fputs(data, fp);
     }
     else {
       printf("Checksum incorrect\n");
     }
   }
+
+  fclose(fp);
 
   return 0; 
 } 

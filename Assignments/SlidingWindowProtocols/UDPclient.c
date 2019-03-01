@@ -82,6 +82,12 @@ int main() {
       sentComplete = 1;
   }
 
+  while(1) {
+    // send end of file confirmation to close server
+    const char * packet = "\0";
+    sendto(sockfd, (const char *)packet, strlen(packet), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
+  }
+
   close(sockfd); 
   return 0; 
 } 

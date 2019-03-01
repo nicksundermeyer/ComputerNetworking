@@ -6,5 +6,6 @@
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
 #include <netinet/in.h> 
+#include <fcntl.h>
 
 int verifyChecksum(uint16_t testSum, unsigned char* data);
