@@ -1,7 +1,7 @@
 #include "UDPclient.h"
 
 #define PORT 7000
-#define MAXLINE 1024
+#define MAXLINE 23
 #define PERPACKET 20
 
 // Driver code 
@@ -60,7 +60,17 @@ int main() {
       tv.tv_sec = 0;
       tv.tv_usec = 1000000; // waits 1sec
       
-      n = recvfrom(sockfd, (char *)buffer, MAXLINE, 0, (struct sockaddr *)&servaddr, &len);
+      n = recvfrom(sockfd, (char *)buffer, 1, 0, (struct sockaddr *)&servaddr, &len);
+
+      //check response
+      char response = buffer[0];
+
+      if(response == '1') {
+        printf("Received ACK!\n");
+      }
+      else {
+        printf("No ACK yet\n");
+      }
       
       // No response, send again
       
@@ -100,9 +110,10 @@ uint16_t checkSum(unsigned char* data) {
     sum += sum >> 16;
   }
 
-  // checksum =~ checksum;
-  sum =~ sum;
-  return sum;
+  // conver to uint16_t and invert bits
+  uint16_t checksum = sum;
+  checksum =~ checksum;
+  return checksum;
 }
 
 void print_char(char x)

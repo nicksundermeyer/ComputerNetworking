@@ -45,12 +45,32 @@ int main() {
 		 0, (struct sockaddr *) &cliaddr, &len); 
     buffer[n] = '\0'; // Make sure string is null terminated
     printf("Received from client: %s\n", buffer); 
-    
-    printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
-    
-    sendto(sockfd, (const char *)("1"), 1, 
-	   0, (struct sockaddr *) &cliaddr, len); // len is sizeof(cliaddr) from above
-    printf("Hello message sent to client.\n"); 
+    // printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
+
+    // copy information out of buffer
+    char seq = buffer[0];
+
+    uint16_t checkSum;
+    memcpy(&checkSum, buffer+1, 2);
+
+    char * data;
+    memcpy(data, buffer+3, 20);
+
+    // verify checksum is correct
+    int correct = verifyChecksum(checkSum, data);
+
+    if(correct == 1)
+    {
+      printf("Checksum verified!\n");
+
+      // sending ack
+      sendto(sockfd, (const char *)("1"), 1, 
+      0, (struct sockaddr *) &cliaddr, len); // len is sizeof(cliaddr) from above
+      printf("ACK sent to client\n"); 
+    }
+    else {
+      printf("Checksum incorrect\n");
+    }
   }
 
   return 0; 
@@ -68,12 +88,12 @@ int verifyChecksum(uint16_t testSum, unsigned char* data) {
     sum += sum >> 16;
   }
 
-  // checksum =~ checksum;
-  sum =~ sum;
-  return sum;
+  // conver to uint16_t and invert bits
+  uint16_t checksum = sum;
+  checksum =~ checksum;
 
   // compare calculated checksum with incoming checksum
-  if(sum == testSum)
+  if(checksum == testSum)
   {
     return 1;
   }
