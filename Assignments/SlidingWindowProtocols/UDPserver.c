@@ -2,7 +2,7 @@
 #include "UDPserver.h"
 
 #define PORT 7000
-#define MAXLINE 1024 
+#define MAXLINE 23 
 
 // Driver code 
 int main() { 
