@@ -5,7 +5,35 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "client",
+            "name": "(Windows) Client",
+            "type": "cppdbg",
+            "request": "launch",
+            "targetArchitecture": "x64",
+            "miDebuggerPath":"C:\\cygwin64\\bin\\gdb.exe",
+            "program": "${workspaceRoot}/client.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}",
+            "environment": [],
+            "externalConsole": false,
+            "preLaunchTask": "Compile (GCC)"
+         },
+         {
+            "name": "(Windows) Server",
+            "type": "cppdbg",
+            "request": "launch",
+            "targetArchitecture": "x64",
+            "miDebuggerPath":"C:\\cygwin64\\bin\\gdb.exe",
+            "program": "${workspaceRoot}/server.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}",
+            "environment": [],
+            "externalConsole": false,
+            "preLaunchTask": "Compile (GCC)"
+         },
+        {
+            "name": "(Mac) Client",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/client",
@@ -15,11 +43,20 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb",
-            "setupCommands": [
-                {
-                    "text": "-enable-pretty-printing"
-                }
-            ]
+            "preLaunchTask": "Compile (GCC)"
+        },
+        {
+            "name": "(Mac) Server",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/server",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "Compile (GCC)"
         }
     ]
 }
