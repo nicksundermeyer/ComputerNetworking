@@ -43,7 +43,7 @@ int main() {
     // get the client address that it was sent from
     n = recvfrom(sockfd, (char *)buffer, MAXLINE, 
 		 0, (struct sockaddr *) &cliaddr, &len); 
-    buffer[n] = '\0'; // Make sure string is null terrminated
+    buffer[n] = '\0'; // Make sure string is null terminated
     printf("Received from client: %s\n", buffer); 
     
     printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
