@@ -9,3 +9,4 @@
 #include <fcntl.h>
 
 int verifyChecksum(uint16_t testSum, unsigned char* data);
+void print_bits ( void* buf, size_t size_in_bytes) ;

@@ -2,12 +2,13 @@
 #include "UDPserver.h"
 
 #define PORT 7000
-#define MAXLINE 23 
+#define MAXLINE 24
+#define PERPACKET 20
 
 // Driver code 
 int main() { 
   int sockfd; 
-  char buffer[MAXLINE]; 
+  unsigned char* buffer = (char*)malloc(MAXLINE);
   struct sockaddr_in servaddr, cliaddr; 
   
   // Creating socket file descriptor 
@@ -44,25 +45,29 @@ int main() {
     // Receive on the socket
     // Get the message sent and
     // get the client address that it was sent from
-    n = recvfrom(sockfd, (char *)buffer, MAXLINE, 0, (struct sockaddr *) &cliaddr, &len);
+    n = recvfrom(sockfd, (unsigned char *)buffer, MAXLINE, 0, (struct sockaddr *) &cliaddr, &len);
 
-    if(buffer[0] == '\0')
-    {
-      break;
-    }
+    // char buf[MAXLINE];
+    // memcpy(&buf, buffer, MAXLINE);
 
-    buffer[n] = '\0'; // Make sure string is null terminated
-    printf("Received from client: %s\n", buffer);
+    // if(buf[0] == '\0')
+    // {
+    //   break;
+    // }
+
+    // buf[n] = '\0'; // Make sure string is null terminated
+    // printf("Received from client: %s\n", buf);
     // printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
 
     // copy information out of buffer
-    char seq = buffer[0];
+    uint16_t seq;
+    memcpy(&seq, buffer, 2);
 
     uint16_t checkSum;
-    memcpy(&checkSum, buffer+1, 2);
+    memcpy(&checkSum, buffer+sizeof(seq), 2);
 
-    char * data;
-    memcpy(data, buffer+3, 21);
+    unsigned char * data = (char*)malloc(PERPACKET);
+    memcpy(data, buffer+4, PERPACKET); 
 
     // verify checksum is correct
     int correct = verifyChecksum(checkSum, data);
@@ -114,4 +119,17 @@ int verifyChecksum(uint16_t testSum, unsigned char* data) {
   {
     return 0;
   }
+}
+
+void print_bits ( void* buf, size_t size_in_bytes )
+{
+    char* ptr = (char*)buf;
+
+    for (size_t i = 0; i < size_in_bytes; i++) {
+        for (short j = 7; j >= 0; j--) {
+            printf("%d", (ptr[i] >> j) & 1);
+        }
+        printf(" ");
+    }
+    printf("\n");
 }

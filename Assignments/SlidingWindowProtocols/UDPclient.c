@@ -1,7 +1,7 @@
 #include "UDPclient.h"
 
 #define PORT 7000
-#define MAXLINE 23
+#define MAXLINE 24
 #define PERPACKET 20
 
 // Driver code 
@@ -63,10 +63,10 @@ int main() {
       sprintf(seq, "%d", sequenceNum);
 
       //create packet
-      const char * packet = makePacket(seq, dataToSend); 
+      unsigned char* packet = makePacket(sequenceNum, dataToSend);
 
       // send packet over socket
-      sendto(sockfd, (const char *)packet, strlen(packet), 
+      sendto(sockfd, (const char *)packet, MAXLINE, 
       0, (struct sockaddr *) &servaddr, sizeof(servaddr)); 
       // printf("Hello message sent to server.\n"); 
       // printf("%x: %x\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
@@ -109,16 +109,15 @@ int main() {
   return 0; 
 } 
 
-unsigned char* makePacket(unsigned char* seq, unsigned char* data) {
+unsigned char* makePacket(uint16_t seq, unsigned char* data) {
   uint16_t checksum = checkSum(data);
-  unsigned char result[24];
+  unsigned char* result = (char*)malloc(MAXLINE);
 
-  memcpy(result, seq, strlen(seq));
-  memcpy(result+strlen(seq), &checksum, sizeof(checksum));
-  memcpy(result+sizeof(checksum)+strlen(seq), data, strlen(data));
+  memcpy(result, &seq, sizeof(seq));
+  memcpy(result+sizeof(seq), &checksum, sizeof(checksum));
+  memcpy(result+sizeof(checksum)+sizeof(seq), data, strlen(data));
 
-  unsigned char* ret = result;
-  return(ret);
+  return(result);
 }
 
 uint16_t checkSum(unsigned char* data) {
@@ -139,20 +138,15 @@ uint16_t checkSum(unsigned char* data) {
   return checksum;
 }
 
-void print_char(char x)
+void print_bits ( void* buf, size_t size_in_bytes )
 {
-    for (int i = 0; i < 8; i++) {
-        printf("%d", (x & 0x8000) >> 15);
-        x <<= 1;
-    }
-    printf("\n");
-}
+    char* ptr = (char*)buf;
 
-void print_int(uint16_t x)
-{
-    for (int i = 0; i < 16; i++) {
-        printf("%d", (x & 0x8000) >> 15);
-        x <<= 1;
+    for (size_t i = 0; i < size_in_bytes; i++) {
+        for (short j = 7; j >= 0; j--) {
+            printf("%d", (ptr[i] >> j) & 1);
+        }
+        printf(" ");
     }
     printf("\n");
 }
