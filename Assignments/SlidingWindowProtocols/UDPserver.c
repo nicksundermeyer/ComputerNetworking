@@ -33,7 +33,7 @@ int main() {
     } 
   printf("bound to: %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
 
-  FILE *fp = fopen("fileOut", "w");
+  FILE *fp = fopen("fileOut", "wb");
 
   // loop to continue waiting for packets
   while(1) {
@@ -47,13 +47,14 @@ int main() {
     // get the client address that it was sent from
     n = recvfrom(sockfd, (unsigned char *)buffer, MAXLINE, 0, (struct sockaddr *) &cliaddr, &len);
 
-    // char buf[MAXLINE];
-    // memcpy(&buf, buffer, MAXLINE);
+    char buf[MAXLINE];
+    memcpy(&buf, buffer, MAXLINE);
 
-    // if(buf[0] == '\0')
-    // {
-    //   break;
-    // }
+    if(buf[0] == '-')
+    {
+      sendto(sockfd, (const char *)("1"), 1, 0, (struct sockaddr *) &cliaddr, len);
+      break;
+    }
 
     // buf[n] = '\0'; // Make sure string is null terminated
     // printf("Received from client: %s\n", buf);

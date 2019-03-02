@@ -54,13 +54,11 @@ int main() {
   uint16_t sequenceNum = 0;
   int sendLoc = 0;
   unsigned char dataToSend[PERPACKET];
-  while (sequenceNum < (strlen(data)-PERPACKET)) {
+  while (sendLoc < strlen(data)) {
+      int t = strlen(data)-PERPACKET;
       // selecting data to send
       sprintf(dataToSend, "%.*s", PERPACKET, data+sendLoc);
-
-      // convert sequence number to char*
-      char* seq;
-      sprintf(seq, "%d", sequenceNum);
+      printf("%s\n", dataToSend);
 
       //create packet
       unsigned char* packet = makePacket(sequenceNum, dataToSend);
@@ -91,19 +89,11 @@ int main() {
       else {
         printf("No ACK yet\n");
       }
-      
-      // Find next section of data to send for packet
-      // Send next packet
-      
-      // Done sending, exit loop
-      // sentComplete = 1;
   }
 
-  while(1) {
-    // send end of file confirmation to close server
-    const char * packet = "\0";
-    sendto(sockfd, (const char *)packet, strlen(packet), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
-  }
+  const char * packet = "-";
+  sendto(sockfd, (const char *)packet, strlen(packet), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
+  n = recvfrom(sockfd, (char *)buffer, 1, 0, (struct sockaddr *)&servaddr, &len);
 
   close(sockfd); 
   return 0; 
