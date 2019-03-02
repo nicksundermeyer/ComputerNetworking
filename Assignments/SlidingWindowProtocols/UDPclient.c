@@ -8,9 +8,19 @@
 int main() { 
   int sockfd; 
   unsigned char buffer[MAXLINE]; 
-  unsigned char *data = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec facilisis sollicitudin mauris dignissim viverra. Phasellus euismod tellus sit amet arcu gravida, sit amet bibendum felis fringilla. Pellentesque magna velit, vulputate et pellentesque quis, laoreet non ante. Etiam mollis tempor ultrices. Proin tempus volutpat justo, vel scelerisque ligula gravida vitae. Etiam purus ipsum, venenatis vel dui sed, dapibus pharetra est. Aliquam ac ipsum in neque porttitor rhoncus a non metus. Etiam sit amet suscipit turpis, ut pretium purus. Proin euismod volutpat orci eu ultricies. Vestibulum vel diam urna. Sed placerat id enim et ultricies. Integer at vulputate velit. Vivamus mattis bibendum libero, a luctus orci dapibus sit amet. Phasellus accumsan gravida purus. Quisque sit amet efficitur eros.";
   struct sockaddr_in servaddr;
-  char *hello = "Hello from client"; 
+
+  // reading data from file
+  FILE *fIn = fopen("fileIn", "rb"); 
+
+  // find size of file
+  fseek(fIn, 0L, SEEK_END);
+  long fSize = ftell(fIn);
+  rewind(fIn);
+
+  // read bytes in from file
+  unsigned char data[fSize];
+  fread(data, 1, fSize, fIn);
 
   // Creating socket file descriptor
   // Last parameter could be IPPROTO_UDP but that is what it will pick anyway with 0
@@ -41,13 +51,19 @@ int main() {
   unsigned int len = sizeof(servaddr); 
 
   int sentComplete = 0;
-  unsigned char* sequenceNum = "0";
-  int sequenceNumInt = 0;
-  unsigned char dataToSend[PERPACKET+1];
-  while (!sentComplete) {
-      // creating packet
-      sprintf(dataToSend, "%.*s", PERPACKET, data + sequenceNumInt);
-      const char * packet = makePacket("0", dataToSend); 
+  uint16_t sequenceNum = 0;
+  int sendLoc = 0;
+  unsigned char dataToSend[PERPACKET];
+  while (sequenceNum < (strlen(data)-PERPACKET)) {
+      // selecting data to send
+      sprintf(dataToSend, "%.*s", PERPACKET, data+sendLoc);
+
+      // convert sequence number to char*
+      char* seq;
+      sprintf(seq, "%d", sequenceNum);
+
+      //create packet
+      const char * packet = makePacket(seq, dataToSend); 
 
       // send packet over socket
       sendto(sockfd, (const char *)packet, strlen(packet), 
@@ -67,19 +83,20 @@ int main() {
 
       if(response == '1') {
         printf("Received ACK!\n");
+
+        // increment to next packet when ACK received
+        sequenceNum += (PERPACKET+3);
+        sendLoc += PERPACKET;
       }
       else {
         printf("No ACK yet\n");
       }
       
-      // No response, send again
-      
       // Find next section of data to send for packet
-      sequenceNum += 24;
       // Send next packet
       
       // Done sending, exit loop
-      sentComplete = 1;
+      // sentComplete = 1;
   }
 
   while(1) {
