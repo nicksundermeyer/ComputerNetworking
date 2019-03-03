@@ -13,7 +13,7 @@ int main() {
   // reading data from file
   FILE *fIn;
 //    if ((fIn = fopen("fileIn", "rb")) == NULL) {
-    if ((fIn = fopen("Desktop/ComputerNetworking/Assignments/SlidingWindowProtocols/fileIn", "rb")) == NULL) {
+    if ((fIn = fopen("Desktop/ComputerNetworking/Assignments/SlidingWindowProtocols/head.png", "rb")) == NULL) {
         printf("Error reading file!\n");
         exit(1);
     }
@@ -25,7 +25,7 @@ int main() {
 
   // read bytes in from file
   unsigned char data[fSize];
-  fread(data, 1, fSize, fIn);
+  size_t read_bytes = fread(data, fSize, 1, fIn);
     
   // Creating socket file descriptor
   // Last parameter could be IPPROTO_UDP but that is what it will pick anyway with 0

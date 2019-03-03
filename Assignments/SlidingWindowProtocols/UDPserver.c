@@ -6,7 +6,8 @@
 #define PERPACKET 20
 
 // Driver code 
-int main() { 
+int main() {
+
   int sockfd; 
   unsigned char* buffer = (char*)malloc(MAXLINE);
   struct sockaddr_in servaddr, cliaddr; 
@@ -33,7 +34,8 @@ int main() {
     } 
   printf("bound to: %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
 
-  FILE *fp = fopen("fileOut", "wb");
+//  FILE *fp = fopen("fileOut", "wb");
+    FILE *fp = fopen("Desktop/ComputerNetworking/Assignments/SlidingWindowProtocols/newhead.png", "wb");
 
   // loop to continue waiting for packets
   while(1) {
@@ -57,8 +59,8 @@ int main() {
     }
 
     // buf[n] = '\0'; // Make sure string is null terminated
-    // printf("Received from client: %s\n", buf);
-    // printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
+    printf("Received from client: %s\n", buf);
+    printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
 
     // copy information out of buffer
     uint16_t seq;
