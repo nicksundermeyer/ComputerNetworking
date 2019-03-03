@@ -71,6 +71,8 @@ int main() {
     memcpy(data, buffer+4, PERPACKET); 
 
     // verify checksum is correct
+      printf("Received (bits): ");
+      print_bits(data, strlen(data));
     int correct = verifyChecksum(checkSum, data);
 
     if(correct == 1)

@@ -5,13 +5,18 @@
 #define PERPACKET 20
 
 // Driver code 
-int main() { 
+int main() {
   int sockfd; 
   unsigned char buffer[MAXLINE]; 
   struct sockaddr_in servaddr;
 
   // reading data from file
-  FILE *fIn = fopen("fileIn", "rb"); 
+  FILE *fIn;
+//    if ((fIn = fopen("fileIn", "rb")) == NULL) {
+    if ((fIn = fopen("Desktop/ComputerNetworking/Assignments/SlidingWindowProtocols/fileIn", "rb")) == NULL) {
+        printf("Error reading file!\n");
+        exit(1);
+    }
 
   // find size of file
   fseek(fIn, 0L, SEEK_END);
@@ -21,7 +26,7 @@ int main() {
   // read bytes in from file
   unsigned char data[fSize];
   fread(data, 1, fSize, fIn);
-
+    
   // Creating socket file descriptor
   // Last parameter could be IPPROTO_UDP but that is what it will pick anyway with 0
   if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
@@ -48,17 +53,21 @@ int main() {
   memcpy(&servaddr.sin_addr.s_addr, server->h_addr, server->h_length);
   
   int n;
-  unsigned int len = sizeof(servaddr); 
-
+  unsigned int len = sizeof(servaddr);
+    
   int sentComplete = 0;
   uint16_t sequenceNum = 0;
   int sendLoc = 0;
-  unsigned char dataToSend[PERPACKET];
+//  unsigned char dataToSend[PERPACKET];
+  unsigned char *dataToSend = (char *) malloc(PERPACKET);
   while (sendLoc < strlen(data)) {
       int t = strlen(data)-PERPACKET;
       // selecting data to send
       sprintf(dataToSend, "%.*s", PERPACKET, data+sendLoc);
-      printf("%s\n", dataToSend);
+//      memcpy(dataToSend, data+sendLoc, PERPACKET);
+      printf("Sending: %s\n", dataToSend);
+      printf("Sending (bits): ");
+      print_bits(dataToSend, strlen(dataToSend));
 
       //create packet
       unsigned char* packet = makePacket(sequenceNum, dataToSend);
@@ -66,28 +75,28 @@ int main() {
       // send packet over socket
       sendto(sockfd, (const char *)packet, MAXLINE, 
       0, (struct sockaddr *) &servaddr, sizeof(servaddr)); 
-      // printf("Hello message sent to server.\n"); 
-      // printf("%x: %x\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
+      printf("Hello message sent to server.\n");
+      printf("%x: %x\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
 
       // Wait for ACK, timeout if no response
-      struct timeval tv;
-      tv.tv_sec = 0;
-      tv.tv_usec = 1000000; // waits 1sec
+      struct timeval timeout = {2, 0};
+      setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
       
       n = recvfrom(sockfd, (char *)buffer, 1, 0, (struct sockaddr *)&servaddr, &len);
-
-      //check response
-      char response = buffer[0];
-
-      if(response == '1') {
-        printf("Received ACK!\n");
-
-        // increment to next packet when ACK received
-        sequenceNum += (PERPACKET+3);
-        sendLoc += PERPACKET;
-      }
-      else {
-        printf("No ACK yet\n");
+      if (n >= 0) {
+          //check response
+          char response = buffer[0];
+          
+          if(response == '1') {
+              printf("Received ACK!\n");
+              
+              // increment to next packet when ACK received
+              sequenceNum += (PERPACKET+3);
+              sendLoc += PERPACKET;
+          }
+          else {
+              printf("No ACK yet\n");
+          }
       }
   }
 
