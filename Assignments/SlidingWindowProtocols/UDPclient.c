@@ -17,7 +17,7 @@ int main() {
         printf("Error reading file!\n");
         exit(1);
     }
-
+    
   // find size of file
   fseek(fIn, 0L, SEEK_END);
   long fSize = ftell(fIn);
@@ -26,6 +26,7 @@ int main() {
   // read bytes in from file
   unsigned char data[fSize];
   size_t read_bytes = fread(data, fSize, 1, fIn);
+    print_data(data, fSize);
     
   // Creating socket file descriptor
   // Last parameter could be IPPROTO_UDP but that is what it will pick anyway with 0
@@ -55,13 +56,14 @@ int main() {
   int n;
   unsigned int len = sizeof(servaddr);
     
-  int sentComplete = 0;
   uint16_t sequenceNum = 0;
   int sendLoc = 0;
 //  unsigned char dataToSend[PERPACKET];
   unsigned char *dataToSend = (char *) malloc(PERPACKET);
-  while (sendLoc < strlen(data)) {
-      int t = strlen(data)-PERPACKET;
+//  while (sendLoc < strlen(data)) {
+//      int t = strlen(data)-PERPACKET;
+  while (sendLoc < fSize) {
+      int t = fSize-PERPACKET;
       // selecting data to send
       sprintf(dataToSend, "%.*s", PERPACKET, data+sendLoc);
 //      memcpy(dataToSend, data+sendLoc, PERPACKET);
@@ -148,4 +150,12 @@ void print_bits ( void* buf, size_t size_in_bytes )
         printf(" ");
     }
     printf("\n");
+}
+
+void print_data(void* buf, size_t size_in_bytes) {
+    int i;
+    printf("PRINTING DATA:\n");
+    for(i = 0; i < size_in_bytes; ++i)
+        printf("%c", ((char *)buf)[i]);
+    printf("\nEND OF DATA\n");
 }

@@ -12,3 +12,4 @@
 unsigned char* makePacket(uint16_t seq, unsigned char* data);
 uint16_t checkSum(unsigned char* data);
 void print_bits ( void* buf, size_t size_in_bytes) ;
+void print_data (void* buf, size_t size_in_bytes);

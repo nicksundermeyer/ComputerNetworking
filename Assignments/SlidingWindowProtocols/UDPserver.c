@@ -1,4 +1,4 @@
-// Server side implementation of UDP client-server model 
+// Server side implementation of UDP client-server model
 #include "UDPserver.h"
 
 #define PORT 7000
@@ -51,16 +51,16 @@ int main() {
 
     char buf[MAXLINE];
     memcpy(&buf, buffer, MAXLINE);
-
+      
+    // buf[n] = '\0'; // Make sure string is null terminated
+    printf("Received from client: %s\n", buf);
+    printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
+      
     if(buf[0] == '-')
     {
       sendto(sockfd, (const char *)("1"), 1, 0, (struct sockaddr *) &cliaddr, len);
       break;
     }
-
-    // buf[n] = '\0'; // Make sure string is null terminated
-    printf("Received from client: %s\n", buf);
-    printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
 
     // copy information out of buffer
     uint16_t seq;
