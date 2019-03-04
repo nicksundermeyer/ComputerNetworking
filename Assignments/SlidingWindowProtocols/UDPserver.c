@@ -9,8 +9,11 @@
 int main() {
 
   int sockfd;
+
+  // tracking expected sequence number and last ACKed sequence number
   uint16_t expectedseqnum = 0;
   uint16_t lastACK = 0;
+
   unsigned char* buffer = (char*)malloc(MAXLINE);
   struct sockaddr_in servaddr, cliaddr; 
   
@@ -37,7 +40,6 @@ int main() {
   printf("bound to: %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
 
   FILE *fp = fopen("fileOut", "wb");
-//    FILE *fp = fopen("fileOut", "wb");
 
   // loop to continue waiting for packets
   while(1) {
@@ -54,10 +56,7 @@ int main() {
     char buf[MAXLINE];
     memcpy(&buf, buffer, MAXLINE);
       
-    // buf[n] = '\0'; // Make sure string is null terminated
-    // printf("Received from client: %s\n", buf);
-    // printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
-      
+    // check if terminating packet has been sent
     if(buf[0] == '-' && buf[1] == '-' && buf[2] == '-')
     {
       sendto(sockfd, (const char *)("1"), 1, 0, (struct sockaddr *) &cliaddr, len);
@@ -120,6 +119,7 @@ int main() {
   return 0; 
 } 
 
+// helper function to verify checksum against incoming data
 int verifyChecksum(uint16_t testSum, unsigned char* data) {
   uint32_t sum = 0;
 
@@ -147,6 +147,7 @@ int verifyChecksum(uint16_t testSum, unsigned char* data) {
   }
 }
 
+// helper function to print out bits
 void print_bits ( void* buf, size_t size_in_bytes )
 {
     char* ptr = (char*)buf;

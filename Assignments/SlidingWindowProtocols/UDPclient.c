@@ -13,11 +13,10 @@ int main() {
 
   // reading data from file
   FILE *fIn;
-//    if ((fIn = fopen("fileIn", "rb")) == NULL) {
-    if ((fIn = fopen("fileIn", "rb")) == NULL) {
-        printf("Error reading file!\n");
-        exit(1);
-    }
+  if ((fIn = fopen("fileIn", "rb")) == NULL) {
+      printf("Error reading file!\n");
+      exit(1);
+  }
     
   // find size of file
   fseek(fIn, 0L, SEEK_END);
@@ -27,7 +26,6 @@ int main() {
   // read bytes in from file
   unsigned char data[fSize];
   size_t read_bytes = fread(data, fSize, 1, fIn);
-    // print_data(data, fSize);
     
   // Creating socket file descriptor
   // Last parameter could be IPPROTO_UDP but that is what it will pick anyway with 0
@@ -112,10 +110,12 @@ int main() {
   return 0; 
 } 
 
+// helper function to make a packet
 unsigned char* makePacket(uint16_t seq, unsigned char* data) {
   uint16_t checksum = checkSum(data);
   unsigned char* result = (char*)malloc(MAXLINE);
 
+  // copy seq, checksum, and data into packet
   memcpy(result, &seq, sizeof(seq));
   memcpy(result+sizeof(seq), &checksum, sizeof(checksum));
   memcpy(result+sizeof(checksum)+sizeof(seq), data, strlen(data));
@@ -123,6 +123,7 @@ unsigned char* makePacket(uint16_t seq, unsigned char* data) {
   return(result);
 }
 
+// helper function to calculate checksum
 uint16_t checkSum(unsigned char* data) {
   uint32_t sum = 0;
 
@@ -141,6 +142,7 @@ uint16_t checkSum(unsigned char* data) {
   return checksum;
 }
 
+// helper functions to print bits
 void print_bits ( void* buf, size_t size_in_bytes )
 {
     char* ptr = (char*)buf;
