@@ -9,7 +9,8 @@
 int main() {
 
   int sockfd;
-  int expectedseqnum = 0;
+  uint16_t expectedseqnum = 0;
+  uint16_t lastACK = 0;
   unsigned char* buffer = (char*)malloc(MAXLINE);
   struct sockaddr_in servaddr, cliaddr; 
   
@@ -74,8 +75,6 @@ int main() {
     memcpy(data, buffer+4, PERPACKET); 
 
     // verify checksum is correct
-      printf("Received (bits): ");
-      print_bits(data, strlen(data));
     int correct = verifyChecksum(checkSum, data);
 
     printf("%d/%d\n", seq, expectedseqnum);
@@ -94,13 +93,23 @@ int main() {
       printf("ACK sent to client\n"); 
 
       // increment expected sequence number
-      expectedseqnum += MAXLINE-1;
+      expectedseqnum += PERPACKET;
+
+      // set last acked sequence number
+      lastACK = seq;
 
       // write data to file
       fputs(data, fp);
     }
     else {
-      printf("Checksum incorrect\n");
+      printf("Incorrect packet: %d/%d\n", correct == 1, seq == expectedseqnum);
+
+      // ACK last successful sequence number
+      const char* response = (char*)malloc(PERPACKET);
+      memcpy(response, &lastACK, 2);
+
+      // sending ack
+      sendto(sockfd, (const char *)response, 1, 0, (struct sockaddr *) &cliaddr, len); // len is sizeof(cliaddr) from above
     }
   }
 

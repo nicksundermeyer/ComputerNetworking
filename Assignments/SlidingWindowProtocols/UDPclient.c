@@ -3,6 +3,7 @@
 #define PORT 7000
 #define MAXLINE 24
 #define PERPACKET 20
+#define WINDOWSIZE 1
 
 // Driver code 
 int main() {
@@ -26,7 +27,7 @@ int main() {
   // read bytes in from file
   unsigned char data[fSize];
   size_t read_bytes = fread(data, fSize, 1, fIn);
-    print_data(data, fSize);
+    // print_data(data, fSize);
     
   // Creating socket file descriptor
   // Last parameter could be IPPROTO_UDP but that is what it will pick anyway with 0
@@ -56,29 +57,21 @@ int main() {
   int n;
   unsigned int len = sizeof(servaddr);
     
-  uint16_t sequenceNum = 0;
-  int sendLoc = 0;
-//  unsigned char dataToSend[PERPACKET];
+  uint16_t windowStart = 0;
   unsigned char *dataToSend = (char *) malloc(PERPACKET);
-//  while (sendLoc < strlen(data)) {
-//      int t = strlen(data)-PERPACKET;
-  while (sendLoc < fSize) {
+
+  while (windowStart < fSize) {
       int t = fSize-PERPACKET;
-      // selecting data to send
-      sprintf(dataToSend, "%.*s", PERPACKET, data+sendLoc);
-//      memcpy(dataToSend, data+sendLoc, PERPACKET);
-      printf("Sending: %s\n", dataToSend);
-      printf("Sending (bits): ");
-      print_bits(dataToSend, strlen(dataToSend));
+
+      // select data for packet
+      sprintf(dataToSend, "%.*s", PERPACKET, data+windowStart);
 
       //create packet
-      unsigned char* packet = makePacket(sequenceNum, dataToSend);
+      unsigned char* packet = makePacket(windowStart, dataToSend);
 
       // send packet over socket
       sendto(sockfd, (const char *)packet, MAXLINE, 
       0, (struct sockaddr *) &servaddr, sizeof(servaddr)); 
-      printf("Hello message sent to server.\n");
-      printf("%x: %x\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
 
       // Wait for ACK, timeout if no response
       struct timeval timeout = {1, 0};
@@ -87,17 +80,14 @@ int main() {
       n = recvfrom(sockfd, (char *)buffer, 1, 0, (struct sockaddr *)&servaddr, &len);
       if (n >= 0) {
           //check response
-          char response = buffer[0];
+          uint16_t response;
+          memcpy(&response, buffer, 2);
           
-          if(response == '1') {
-              printf("Received ACK!\n");
-              
-              // increment to next packet when ACK received
-              sequenceNum += (PERPACKET+3);
-              sendLoc += PERPACKET;
-          }
-          else {
-              printf("No ACK yet\n");
+          printf("Received ACK! %d\n", response);
+
+          // set window to start at the location in the data for the ACKed packet
+          if(response > 0) {
+            windowStart = response + PERPACKET;
           }
       }
   }

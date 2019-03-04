@@ -15,7 +15,7 @@
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
             "environment": [],
-            "externalConsole": false,
+            "externalConsole": true,
             "preLaunchTask": "Make Client"
          },
          {
@@ -29,7 +29,7 @@
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
             "environment": [],
-            "externalConsole": false,
+            "externalConsole": true,
             "preLaunchTask": "Make Server"
          },
         {
@@ -41,7 +41,7 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": false,
+            "externalConsole": true,
             "MIMode": "lldb",
             "preLaunchTask": "Make Client"
         },
@@ -54,7 +54,7 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": false,
+            "externalConsole": true,
             "MIMode": "lldb",
             "preLaunchTask": "Make Server"
         }
@@ -63,6 +63,10 @@
         {
             "name": "(Windows) Server/Client",
             "configurations": ["(Windows) Server", "(Windows) Client"]
+        },
+        {
+            "name": "(Mac) Server/Client",
+            "configurations": ["(Mac) Server", "(Mac) Client"]
         }
     ]
 }

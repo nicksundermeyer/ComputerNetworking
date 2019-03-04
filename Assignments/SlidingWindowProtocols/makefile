@@ -3,11 +3,11 @@ all: UDPclient.c UDPserver.c
 	make server
 
 client: UDPclient.c UDPclient.h
-	gcc -c UDPclient.c -g -o UDPclient.o
-	gcc UDPclient.o -L. -g -o client
-	gcc UDPclient.o -L. -g -o client.exe
+	gcc-8 -c UDPclient.c -fopenmp -g -o UDPclient.o
+	gcc-8 UDPclient.o -L. -fopenmp -g -o client
+	gcc-8 UDPclient.o -L. -fopenmp -g -o client.exe
 
 server: UDPserver.c UDPserver.h
-	gcc -c UDPserver.c -g -o UDPserver.o
-	gcc UDPserver.o -L. -g -o server
-	gcc UDPserver.o -L. -g -o server.exe
+	gcc-8 -c UDPserver.c -fopenmp -g -o UDPserver.o
+	gcc-8 UDPserver.o -L. -fopenmp -g -o server
+	gcc-8 UDPserver.o -L. -fopenmp -g -o server.exe

@@ -8,6 +8,7 @@
 #include <arpa/inet.h> 
 #include <netinet/in.h> 
 #include <netdb.h> // gethostbyname - IPv4
+#include <omp.h>
 
 unsigned char* makePacket(uint16_t seq, unsigned char* data);
 uint16_t checkSum(unsigned char* data);
