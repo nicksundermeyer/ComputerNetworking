@@ -35,7 +35,7 @@ int main() {
   printf("bound to: %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
 
 //  FILE *fp = fopen("fileOut", "wb");
-    FILE *fp = fopen("Desktop/ComputerNetworking/Assignments/SlidingWindowProtocols/newclient", "wb");
+    FILE *fp = fopen("Desktop/ComputerNetworking/Assignments/SlidingWindowProtocols/fileOut", "wb");
 
   // loop to continue waiting for packets
   while(1) {
