@@ -8,7 +8,8 @@
 // Driver code 
 int main() {
 
-  int sockfd; 
+  int sockfd;
+  int expectedseqnum = 0;
   unsigned char* buffer = (char*)malloc(MAXLINE);
   struct sockaddr_in servaddr, cliaddr; 
   
@@ -35,7 +36,7 @@ int main() {
   printf("bound to: %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
 
 //  FILE *fp = fopen("fileOut", "wb");
-    FILE *fp = fopen("Desktop/ComputerNetworking/Assignments/SlidingWindowProtocols/fileOut", "wb");
+    FILE *fp = fopen("fileOut", "wb");
 
   // loop to continue waiting for packets
   while(1) {
@@ -53,8 +54,8 @@ int main() {
     memcpy(&buf, buffer, MAXLINE);
       
     // buf[n] = '\0'; // Make sure string is null terminated
-    printf("Received from client: %s\n", buf);
-    printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
+    // printf("Received from client: %s\n", buf);
+    // printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
       
     if(buf[0] == '-' && buf[1] == '-' && buf[2] == '-')
     {
@@ -77,14 +78,23 @@ int main() {
       print_bits(data, strlen(data));
     int correct = verifyChecksum(checkSum, data);
 
-    if(correct == 1)
+    printf("%d/%d\n", seq, expectedseqnum);
+
+    if(correct == 1 && seq == expectedseqnum)
     {
       printf("Checksum verified!\n");
 
+      // copy sequence number into char* to send ack
+      const char* response = (char*)malloc(PERPACKET);
+      memcpy(response, &seq, 2);
+
       // sending ack
-      sendto(sockfd, (const char *)("1"), 1, 
+      sendto(sockfd, (const char *)response, 1, 
       0, (struct sockaddr *) &cliaddr, len); // len is sizeof(cliaddr) from above
       printf("ACK sent to client\n"); 
+
+      // increment expected sequence number
+      expectedseqnum += MAXLINE-1;
 
       // write data to file
       fputs(data, fp);
