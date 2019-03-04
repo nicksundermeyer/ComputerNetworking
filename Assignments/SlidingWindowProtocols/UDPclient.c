@@ -77,7 +77,8 @@ int main() {
       struct timeval timeout = {1, 0};
       setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
       
-      n = recvfrom(sockfd, (char *)buffer, 1, 0, (struct sockaddr *)&servaddr, &len);
+      n = recvfrom(sockfd, (char *)buffer, 2, 0, (struct sockaddr *)&servaddr, &len);
+      
       if (n >= 0) {
           //check response
           uint16_t response;
@@ -86,7 +87,7 @@ int main() {
           printf("Received ACK! %d\n", response);
 
           // set window to start at the location in the data for the ACKed packet
-          if(response > 0) {
+          if(response >= 0) {
             windowStart = response + PERPACKET;
           }
       }

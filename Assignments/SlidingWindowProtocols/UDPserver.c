@@ -36,8 +36,8 @@ int main() {
     } 
   printf("bound to: %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
 
-//  FILE *fp = fopen("fileOut", "wb");
-    FILE *fp = fopen("fileOut", "wb");
+  FILE *fp = fopen("fileOut", "wb");
+//    FILE *fp = fopen("fileOut", "wb");
 
   // loop to continue waiting for packets
   while(1) {
@@ -78,7 +78,7 @@ int main() {
     int correct = verifyChecksum(checkSum, data);
 
     printf("%d/%d\n", seq, expectedseqnum);
-
+      
     if(correct == 1 && seq == expectedseqnum)
     {
       printf("Checksum verified!\n");
@@ -88,7 +88,7 @@ int main() {
       memcpy(response, &seq, 2);
 
       // sending ack
-      sendto(sockfd, (const char *)response, 1, 
+      sendto(sockfd, (const char *)response, 2,
       0, (struct sockaddr *) &cliaddr, len); // len is sizeof(cliaddr) from above
       printf("ACK sent to client\n"); 
 
@@ -103,7 +103,9 @@ int main() {
     }
     else {
       printf("Incorrect packet: %d/%d\n", correct == 1, seq == expectedseqnum);
-
+        printf("expected packet: %d\n", expectedseqnum);
+        printf("actual packet: %d\n", seq);
+        
       // ACK last successful sequence number
       const char* response = (char*)malloc(PERPACKET);
       memcpy(response, &lastACK, 2);
