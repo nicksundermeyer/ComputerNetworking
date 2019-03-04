@@ -13,7 +13,7 @@ int main() {
   // reading data from file
   FILE *fIn;
 //    if ((fIn = fopen("fileIn", "rb")) == NULL) {
-    if ((fIn = fopen("Desktop/ComputerNetworking/Assignments/SlidingWindowProtocols/head.png", "rb")) == NULL) {
+    if ((fIn = fopen("Desktop/ComputerNetworking/Assignments/SlidingWindowProtocols/client", "rb")) == NULL) {
         printf("Error reading file!\n");
         exit(1);
     }
@@ -81,7 +81,7 @@ int main() {
       printf("%x: %x\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
 
       // Wait for ACK, timeout if no response
-      struct timeval timeout = {2, 0};
+      struct timeval timeout = {1, 0};
       setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
       
       n = recvfrom(sockfd, (char *)buffer, 1, 0, (struct sockaddr *)&servaddr, &len);
@@ -102,7 +102,7 @@ int main() {
       }
   }
 
-  const char * packet = "-";
+  const char * packet = "---";
   sendto(sockfd, (const char *)packet, strlen(packet), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
   n = recvfrom(sockfd, (char *)buffer, 1, 0, (struct sockaddr *)&servaddr, &len);
 

@@ -35,7 +35,7 @@ int main() {
   printf("bound to: %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
 
 //  FILE *fp = fopen("fileOut", "wb");
-    FILE *fp = fopen("Desktop/ComputerNetworking/Assignments/SlidingWindowProtocols/newhead.png", "wb");
+    FILE *fp = fopen("Desktop/ComputerNetworking/Assignments/SlidingWindowProtocols/newclient", "wb");
 
   // loop to continue waiting for packets
   while(1) {
@@ -56,7 +56,7 @@ int main() {
     printf("Received from client: %s\n", buf);
     printf("from: %x: %x\n", cliaddr.sin_addr.s_addr, cliaddr.sin_port);
       
-    if(buf[0] == '-')
+    if(buf[0] == '-' && buf[1] == '-' && buf[2] == '-')
     {
       sendto(sockfd, (const char *)("1"), 1, 0, (struct sockaddr *) &cliaddr, len);
       break;
