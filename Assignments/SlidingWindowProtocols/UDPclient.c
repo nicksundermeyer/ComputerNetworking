@@ -14,7 +14,7 @@ int main() {
   // reading data from file
   FILE *fIn;
 //    if ((fIn = fopen("fileIn", "rb")) == NULL) {
-    if ((fIn = fopen("fileIn", "rb")) == NULL) {
+    if ((fIn = fopen("Desktop/ComputerNetworking/Assignments/SlidingWindowProtocols/fileIn", "rb")) == NULL) {
         printf("Error reading file!\n");
         exit(1);
     }
@@ -63,34 +63,45 @@ int main() {
   while (windowStart < fSize) {
       int t = fSize-PERPACKET;
 
-      // select data for packet
-      sprintf(dataToSend, "%.*s", PERPACKET, data+windowStart);
-
-      //create packet
-      unsigned char* packet = makePacket(windowStart, dataToSend);
-
-      // send packet over socket
-      sendto(sockfd, (const char *)packet, MAXLINE, 
-      0, (struct sockaddr *) &servaddr, sizeof(servaddr)); 
-
-      // Wait for ACK, timeout if no response
-      struct timeval timeout = {1, 0};
-      setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
-      
-      n = recvfrom(sockfd, (char *)buffer, 2, 0, (struct sockaddr *)&servaddr, &len);
-      
-      if (n >= 0) {
-          //check response
-          uint16_t response;
-          memcpy(&response, buffer, 2);
-          
-          printf("Received ACK! %d\n", response);
-
-          // set window to start at the location in the data for the ACKed packet
-          if(response >= 0) {
-            windowStart = response + PERPACKET;
+      #pragma omp parallel sections
+      {
+          #pragma omp section
+          {
+              // select data for packet
+              sprintf(dataToSend, "%.*s", PERPACKET, data+windowStart);
+              printf("Sending: %.*s\n", PERPACKET, data+windowStart);
+              
+              //create packet
+              unsigned char* packet = makePacket(windowStart, dataToSend);
+              
+              // send packet over socket
+              sendto(sockfd, (const char *)packet, MAXLINE, 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
+          }
+          #pragma omp section
+          {
+              // Wait for ACK, timeout if no response
+              struct timeval timeout = {1, 0};
+              setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+          }
+          #pragma omp section
+          {
+              n = recvfrom(sockfd, (char *)buffer, 2, 0, (struct sockaddr *)&servaddr, &len);
+              
+              if (n >= 0) {
+                  //check response
+                  uint16_t response;
+                  memcpy(&response, buffer, 2);
+                  
+                  printf("Received ACK! %d\n", response);
+                  
+                  // set window to start at the location in the data for the ACKed packet
+                  if(response >= 0) {
+                      windowStart = response + PERPACKET;
+                  }
+              }
           }
       }
+    
   }
 
   const char * packet = "---";
