@@ -14,7 +14,7 @@ int main() {
   // reading data from file
   FILE *fIn;
 //    if ((fIn = fopen("fileIn", "rb")) == NULL) {
-    if ((fIn = fopen("Desktop/ComputerNetworking/Assignments/SlidingWindowProtocols/fileIn", "rb")) == NULL) {
+    if ((fIn = fopen("fileIn", "rb")) == NULL) {
         printf("Error reading file!\n");
         exit(1);
     }
