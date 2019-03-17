@@ -4,4 +4,6 @@
 
 #include <stdio.h>
 
+void createRouter();
+
 #endif /* Routers_h */
