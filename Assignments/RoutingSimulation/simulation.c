@@ -73,30 +73,4 @@ void createRouter(char* router_name, int router_num) {
     }
     memcpy(&servaddr.sin_addr.s_addr, server->h_addr, server->h_length);
     printf("Router open at %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
-    
-    while(1) {
-//        printf("Awaiting input...\n");
-    }
-
-//    //Make packet to send
-//    unsigned char* packet = makePacket("Hello World");
-//
-//    // Start sending packet over socket
-//    while(1)
-//    {
-//        sendto(sockfd, (const char *)packet, MAXLINE, 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
-//    }
 }
-
-// helper function to make a packet
-//unsigned char* makePacket(unsigned char* data) {
-//    unsigned char* result = (char*)malloc(MAXLINE);
-//    uint8_t type = 1;
-//
-//    // copy packet type and data into packet
-//    memcpy(result, &type, sizeof(type));
-//    memcpy(result+sizeof(type), data, strlen(data));
-//
-//    return(result);
-//}
-
