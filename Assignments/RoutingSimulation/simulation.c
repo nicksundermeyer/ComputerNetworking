@@ -74,14 +74,14 @@ void createRouter(char* router_name, int router_num) {
     }
     memcpy(&servaddr.sin_addr.s_addr, server->h_addr, server->h_length);
 
-    //Make packet to send
-    unsigned char* packet = makePacket("Hello World");
-
-    // Start sending packet over socket
-    while(1)
-    {
-        sendto(sockfd, (const char *)packet, MAXLINE, 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
-    }
+//    //Make packet to send
+//    unsigned char* packet = makePacket("Hello World");
+//
+//    // Start sending packet over socket
+//    while(1)
+//    {
+//        sendto(sockfd, (const char *)packet, MAXLINE, 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
+//    }
 }
 
 // helper function to make a packet
