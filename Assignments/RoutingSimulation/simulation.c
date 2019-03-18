@@ -48,11 +48,9 @@ void createRouter(char* router_name, int router_num) {
     size_t read_data = fread(neighbors, 1, fSize, fIn);
     printf("Created router %d with %d neighbors.\n", router_num, fSize);
     
-    // setup sockets
-    
-    // Creating socket file descriptor
-    // Last parameter could be IPPROTO_UDP but that is what it will pick anyway with 0
-    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+    // setup socket
+
+    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
         perror("socket creation failed"); 
         exit(EXIT_FAILURE); 
     } 
@@ -60,7 +58,8 @@ void createRouter(char* router_name, int router_num) {
     memset(&servaddr, 0, sizeof(servaddr));   // dest, src, size
     
     // Filling server information 
-    servaddr.sin_family = AF_INET; 
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = INADDR_ANY;
     servaddr.sin_port = htons(PORT+router_num);
 
     // Setup the server host address
@@ -73,6 +72,13 @@ void createRouter(char* router_name, int router_num) {
         exit(0);
     }
     memcpy(&servaddr.sin_addr.s_addr, server->h_addr, server->h_length);
+    printf("Router open at %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
+    
+    int packetsize = 20;
+    unsigned char* buffer = (char*) malloc(packetsize);
+    while(1) {
+//        printf("Awaiting input...\n");
+    }
 
 //    //Make packet to send
 //    unsigned char* packet = makePacket("Hello World");
@@ -85,13 +91,14 @@ void createRouter(char* router_name, int router_num) {
 }
 
 // helper function to make a packet
-unsigned char* makePacket(unsigned char* data) {
-    unsigned char* result = (char*)malloc(MAXLINE);
-    uint8_t type = 1;
+//unsigned char* makePacket(unsigned char* data) {
+//    unsigned char* result = (char*)malloc(MAXLINE);
+//    uint8_t type = 1;
+//
+//    // copy packet type and data into packet
+//    memcpy(result, &type, sizeof(type));
+//    memcpy(result+sizeof(type), data, strlen(data));
+//
+//    return(result);
+//}
 
-    // copy packet type and data into packet
-    memcpy(result, &type, sizeof(type));
-    memcpy(result+sizeof(type), data, strlen(data));
-
-    return(result);
-}
