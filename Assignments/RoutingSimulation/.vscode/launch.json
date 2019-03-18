@@ -17,7 +17,20 @@
             "environment": [],
             "externalConsole": true,
             "MIMode": "lldb",
-            "preLaunchTask": "Make All"
+            "preLaunchTask": "Make Simulation"
+        },
+        {
+            "name": "(Mac) Router",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/router",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "lldb",
+            "preLaunchTask": "Make Router"
         }
     ]
 }

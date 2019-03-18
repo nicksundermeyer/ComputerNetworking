@@ -5,6 +5,16 @@
             "label": "Make All",
             "command": "make all", // Could be any other shell command
             "type": "shell"
+        },
+        {
+            "label": "Make Simulation",
+            "command": "make simulation", // Could be any other shell command
+            "type": "shell"
+        },
+        {
+            "label": "Make Router",
+            "command": "make router", // Could be any other shell command
+            "type": "shell"
         }
     ]
 }
