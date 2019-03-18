@@ -1,0 +1,18 @@
+#ifndef demo_h
+#define demo_h
+
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <unistd.h> 
+#include <string.h> 
+#include <sys/types.h> 
+#include <sys/socket.h> 
+#include <arpa/inet.h> 
+#include <netinet/in.h> 
+#include <netdb.h>
+#include <omp.h>
+
+unsigned char* makePacket(uint16_t src, uint16_t dest, unsigned char* data);
+void print_data(void* buf, size_t size_in_bytes);
+
+#endif

@@ -20,17 +20,17 @@
             "preLaunchTask": "Make Simulation"
         },
         {
-            "name": "(Mac) Router",
+            "name": "(Mac) Demo",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/router",
+            "program": "${workspaceFolder}/demo",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": true,
             "MIMode": "lldb",
-            "preLaunchTask": "Make Router"
+            "preLaunchTask": "Make Demo"
         }
     ]
 }

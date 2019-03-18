@@ -12,8 +12,8 @@
             "type": "shell"
         },
         {
-            "label": "Make Router",
-            "command": "make router", // Could be any other shell command
+            "label": "Make Demo",
+            "command": "make demo", // Could be any other shell command
             "type": "shell"
         }
     ]
