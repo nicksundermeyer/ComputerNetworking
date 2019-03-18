@@ -1,11 +1,15 @@
-
 #include "simulation.h"
 
 #define PORT 7000
-#define NUMROUTERS 3
 #define MAXLINE 10
+int NUMROUTERS;
 
-int main() {
+int main(int argc, char** argv) {
+    if(argc>1)
+    {
+        NUMROUTERS = atoi(argv[1]);
+    }
+
     omp_set_num_threads(NUMROUTERS);
 #pragma omp parallel
     {

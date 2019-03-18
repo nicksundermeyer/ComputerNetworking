@@ -1,5 +1,7 @@
 #include "router.h"
 
+#define PORT 7000
+
 int main() {
     int router_num;
     char filename[100];
@@ -24,7 +26,36 @@ int main() {
     size_t read_data = fread(neighbors, 1, fSize, fIn);
     printf("Created router with %d neighbors.\n", fSize);
     
+    startListening(router_num, neighbors);
+    
     return 0;
+}
+
+void startListening(int router_number, int* list_of_neighbors) {
+    int sockfd;
+    struct sockaddr_in servaddr;
+    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
+        perror("socket creation failed");
+        exit(EXIT_FAILURE);
+    }
+    
+    memset(&servaddr, 0, sizeof(servaddr));   // dest, src, size
+    
+    // Filling server information
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_port = htons(PORT+router_number);
+    
+    // Setup the server host address
+    unsigned char* host = "localhost";
+    
+    struct hostent *server;
+    server = gethostbyname(host);
+    if (server == NULL) {
+        fprintf(stderr,"ERROR: No such host.\n");
+        exit(1);
+    }
+    memcpy(&servaddr.sin_addr.s_addr, server->h_addr, server->h_length);
+    printf("did something!\n");
 }
 
 
