@@ -1,7 +1,7 @@
 #include "simulation.h"
 
 #define PORT 7000
-#define MAXLINE 10
+#define MAXLINE 20
 int NUMROUTERS;
 char* ROOTNAME;
 
@@ -74,8 +74,6 @@ void createRouter(char* router_name, int router_num) {
     memcpy(&servaddr.sin_addr.s_addr, server->h_addr, server->h_length);
     printf("Router open at %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
     
-    int packetsize = 20;
-    unsigned char* buffer = (char*) malloc(packetsize);
     while(1) {
 //        printf("Awaiting input...\n");
     }
