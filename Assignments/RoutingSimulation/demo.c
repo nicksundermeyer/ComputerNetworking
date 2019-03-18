@@ -65,3 +65,17 @@ unsigned char* makePacket(uint16_t src, uint16_t dest, unsigned char* data) {
 
     return(result);
 }
+
+// helper function to print out bits
+void print_bits ( void* buf, size_t size_in_bytes )
+{
+    char* ptr = (char*)buf;
+
+    for (size_t i = 0; i < size_in_bytes; i++) {
+        for (short j = 7; j >= 0; j--) {
+            printf("%d", (ptr[i] >> j) & 1);
+        }
+        printf(" ");
+    }
+    printf("\n");
+}

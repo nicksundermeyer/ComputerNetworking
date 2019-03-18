@@ -13,6 +13,6 @@
 #include <omp.h>
 
 unsigned char* makePacket(uint16_t src, uint16_t dest, unsigned char* data);
-void print_data(void* buf, size_t size_in_bytes);
+void print_bits ( void* buf, size_t size_in_bytes );
 
 #endif
