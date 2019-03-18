@@ -14,6 +14,6 @@
 #include <omp.h>
 
 void createRouter(char* router_name, int router_num);
-//unsigned char* makePacket(unsigned char* data);
+void print_bits ( void* buf, size_t size_in_bytes );
 
 #endif /* simulation_h */

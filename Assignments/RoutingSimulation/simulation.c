@@ -23,13 +23,8 @@ int main(int argc, char** argv) {
 }
 
 void createRouter(char* router_name, int router_num) {
-    int sockfd; 
-    unsigned char buffer[MAXLINE]; 
-    struct sockaddr_in servaddr;
-    
     // read file
     char router_file[100];
-//    sprintf(router_file, "Desktop/ComputerNetworking/Assignments/RoutingSimulation/%s-%d.txt", ROOTNAME, omp_get_thread_num());
     sprintf(router_file, "%s-%d.txt", ROOTNAME, omp_get_thread_num());
     FILE *fIn = fopen(router_file, "rb");
     if (fIn == NULL) {
@@ -50,27 +45,58 @@ void createRouter(char* router_name, int router_num) {
     
     // setup socket
 
-    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
+    int sockfd;
+
+    unsigned char* buffer = (char*)malloc(MAXLINE);
+    struct sockaddr_in servaddr, cliaddr; 
+
+    // Creating socket file descriptor 
+    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
         perror("socket creation failed"); 
-        exit(EXIT_FAILURE); 
+        exit(EXIT_FAILURE);
     } 
 
-    memset(&servaddr, 0, sizeof(servaddr));   // dest, src, size
-    
-    // Filling server information 
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = INADDR_ANY;
-    servaddr.sin_port = htons(PORT+router_num);
+    memset(&servaddr, 0, sizeof(servaddr)); 
+    memset(&cliaddr, 0, sizeof(cliaddr)); 
 
-    // Setup the server host address
-    unsigned char* host = "localhost";
+    // Filling server information
+    // The given port on this computer
+    servaddr.sin_family = AF_INET; // IPv4 
+    servaddr.sin_addr.s_addr = INADDR_ANY; 
+    servaddr.sin_port = htons(PORT+omp_get_thread_num()); 
 
-    struct hostent *server;
-    server = gethostbyname(host);
-    if (server == NULL) {
-        fprintf(stderr,"ERROR, no such host\n");
-        exit(0);
+    // Bind the socket with the server address 
+    if ( bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0 ) { 
+        perror("bind failed"); 
+        exit(EXIT_FAILURE); 
+    } 
+    printf("bound to: %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
+
+    // loop to wait for packets
+    while(1)
+    {
+        printf("Server ready\n");
+
+        unsigned int len = sizeof(cliaddr);
+        int n = recvfrom(sockfd, (unsigned char *)buffer, MAXLINE, 0, (struct sockaddr *) &cliaddr, &len);
+
+        char buf[MAXLINE];
+        memcpy(&buf, buffer, MAXLINE);
+
+        print_bits(buf, MAXLINE);
     }
-    memcpy(&servaddr.sin_addr.s_addr, server->h_addr, server->h_length);
-    printf("Router open at %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
+}
+
+// helper function to print out bits
+void print_bits ( void* buf, size_t size_in_bytes )
+{
+    char* ptr = (char*)buf;
+
+    for (size_t i = 0; i < size_in_bytes; i++) {
+        for (short j = 7; j >= 0; j--) {
+            printf("%d", (ptr[i] >> j) & 1);
+        }
+        printf(" ");
+    }
+    printf("\n");
 }
