@@ -13,7 +13,7 @@
 #include <netdb.h>
 #include <omp.h>
 
-void createRouter();
+void createRouter(char* router_name, int router_num);
 unsigned char* makePacket(unsigned char* data);
 
 #endif /* simulation_h */

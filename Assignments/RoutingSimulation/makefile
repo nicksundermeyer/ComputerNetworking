@@ -1,6 +1,6 @@
 all: simulation.c demo.c
 	make demo
-	make sender
+	make simulation
 
 simulation: simulation.c simulation.h
 	gcc-8 -c simulation.c -fopenmp -g -o simulation.o
