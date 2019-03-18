@@ -104,3 +104,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+Assignments/RoutingSimulation/simulation
+Assignments/RoutingSimulation/router

@@ -1,13 +1,13 @@
-all: Routers.c PacketSender.c
+all: simulation.c router.c
 	make routers
 	make sender
 
-routers: Routers.c Routers.h
-	gcc-8 -c Routers.c -fopenmp -g -o Routers.o
-	gcc-8 Routers.o -L. -fopenmp -g -o routers
-	gcc-8 Routers.o -L. -fopenmp -g -o routers.exe
+routers: simulation.c simulation.h
+	gcc-8 -c simulation.c -fopenmp -g -o simulation.o
+	gcc-8 simulation.o -L. -fopenmp -g -o simulation
+	gcc-8 simulation.o -L. -fopenmp -g -o simulation.exe
 
-sender: PacketSender.c PacketSender.h
-	gcc-8 -c PacketSender.c -fopenmp -g -o PacketSender.o
-	gcc-8 PacketSender.o -L. -fopenmp -g -o packetsender
-	gcc-8 PacketSender.o -L. -fopenmp -g -o packetsender.exe
+sender: router.c router.h
+	gcc-8 -c router.c -fopenmp -g -o router.o
+	gcc-8 router.o -L. -fopenmp -g -o router
+	gcc-8 router.o -L. -fopenmp -g -o router.exe

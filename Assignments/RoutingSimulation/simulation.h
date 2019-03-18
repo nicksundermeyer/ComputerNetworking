@@ -1,6 +1,6 @@
 
-#ifndef Routers_h
-#define Routers_h
+#ifndef simulation_h
+#define simulation_h
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,4 +10,4 @@
 
 void createRouter();
 
-#endif /* Routers_h */
+#endif /* simulation_h */
