@@ -10,7 +10,8 @@
             "request": "launch",
             "program": "${workspaceFolder}/simulation",
             "args": [
-                "3"
+                "3",
+                "neighbors"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

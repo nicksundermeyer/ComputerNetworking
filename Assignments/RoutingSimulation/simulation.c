@@ -83,7 +83,19 @@ void createRouter(char* router_name, int router_num) {
         char buf[MAXLINE];
         memcpy(&buf, buffer, MAXLINE);
 
-        print_bits(buf, MAXLINE);
+        uint8_t type;
+        memcpy(&type, buffer, sizeof(type));
+        printf("Type: %d\n", type);
+
+        uint16_t src;
+        memcpy(&src, buffer+sizeof(type), sizeof(src));
+        printf("Src: %d\n", src);
+
+        uint16_t dest;
+        memcpy(&dest, buffer+sizeof(type)+sizeof(src), sizeof(dest));
+        printf("Dest: %d\n", dest);
+
+        // print_bits(buf, MAXLINE);
     }
 }
 
