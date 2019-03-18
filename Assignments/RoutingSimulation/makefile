@@ -1,6 +1,6 @@
 all: simulation.c router.c
-	make routers
-	make sender
+	make simulation
+	make router
 
 simulation: simulation.c simulation.h
 	gcc-8 -c simulation.c -fopenmp -g -o simulation.o
