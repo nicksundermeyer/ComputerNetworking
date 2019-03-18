@@ -23,6 +23,14 @@ int main(int argc, char** argv) {
 }
 
 void createRouter(char* router_name, int router_num) {
+    // create table for BF & fill with -1
+    int table[NUMROUTERS][NUMROUTERS];
+    for (int i = 0; i < NUMROUTERS; i++) {
+        for (int j = 0; j < NUMROUTERS; j++) {
+            table[i][j] = -1;
+        }
+    }
+    
     // read file
     char router_file[100];
     sprintf(router_file, "%s-%d.txt", ROOTNAME, omp_get_thread_num());
@@ -43,8 +51,21 @@ void createRouter(char* router_name, int router_num) {
     size_t read_data = fread(neighbors, 1, fSize, fIn);
     printf("Created router %d with %d neighbors.\n", router_num, fSize);
     
+    // fill initial row of table
+    for (int i = 0; i < NUMROUTERS; i++) {
+        table[router_num][i] = neighbors[i];
+    }
+    printf("Two Dimensional array elements:\n");
+    for(int i=0; i<3; i++) {
+        for(int j=0;j<3;j++) {
+            printf("(%d, %d) ", router_num, table[i][j]);
+            if(j==2){
+                printf("\n");
+            }
+        }
+    }
+    
     // setup socket
-
     int sockfd;
 
     unsigned char* buffer = (char*)malloc(MAXLINE);
