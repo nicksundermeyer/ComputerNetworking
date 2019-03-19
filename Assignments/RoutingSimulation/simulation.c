@@ -35,7 +35,7 @@ void createRouter(char* router_name, int router_num) {
         exit(1);
     }
     
-    fseek(fIn, 0L, SEEK_END);
+    fseek(fIn, 0L, SEEK_END); // read file
     long fSize = ftell(fIn);
     rewind(fIn);
     if (fSize != NUMROUTERS) {
@@ -50,15 +50,15 @@ void createRouter(char* router_name, int router_num) {
     for (int i = 0; i < NUMROUTERS; i++) {
         table[router_num][i] = neighbors[i] - '0';
     }
-    printf("Two Dimensional array elements:\n");
-    for(int i=0; i<3; i++) {
-        for(int j=0;j<3;j++) {
-            printf("(%d, %d) ", router_num, table[i][j]);
-            if(j==2){
-                printf("\n");
-            }
-        }
-    }
+//    printf("Two Dimensional array elements:\n");
+//    for(int i=0; i<3; i++) {
+//        for(int j=0;j<3;j++) {
+//            printf("(%d, %d) ", router_num, table[i][j]);
+//            if(j==2){
+//                printf("\n");
+//            }
+//        }
+//    }
     
     // setup socket
     int sockfd;
@@ -110,7 +110,7 @@ void createRouter(char* router_name, int router_num) {
             uint8_t temp_table[NUMROUTERS][NUMROUTERS];
             memcpy(&temp_table, buffer+1, NUMROUTERS*NUMROUTERS);
 
-            int checkEqual = 0;
+            int checkEqual = 0; // test to see if table already have and received are the same, if they are then stop sending packets
             for (int i = 0; i < NUMROUTERS; i++) {
                 for (int j = 0; j < NUMROUTERS; j++) {
                     if (table[i][j] != temp_table[i][j]) {
@@ -122,7 +122,7 @@ void createRouter(char* router_name, int router_num) {
             if (!checkEqual) { // Send packets until all tables at each router are equal
                 sendPacketToNeighbors(router_num, table);
             }
-            else {
+            else { // implementation of bellman-ford equation
                 int minValue = 255;
                 for (int i = 0; i < NUMROUTERS; i++) {
                     if (table[router_num][i] != 0 && table[router_num][i] != 255) {
