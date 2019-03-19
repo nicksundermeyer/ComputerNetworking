@@ -157,7 +157,7 @@ unsigned char* makeControlPacket(uint8_t data[NUMROUTERS][NUMROUTERS]) {
 }
 
 // helper function to send data to socket
-void sendToSocket(unsigned char* packet)
+void sendToSocket(uint8_t dest, unsigned char* packet)
 {
     // set up port and send
         int sockfd; 
@@ -177,7 +177,7 @@ void sendToSocket(unsigned char* packet)
         
         // Filling server information 
         servaddr.sin_family = AF_INET; 
-        servaddr.sin_port = htons(PORT+omp_get_thread_num()); 
+        servaddr.sin_port = htons(PORT+dest); 
 
         // Setup the server host address
         unsigned char* host = "localhost";
