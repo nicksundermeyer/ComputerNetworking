@@ -106,18 +106,20 @@ void createRouter(char* router_name, int router_num) {
         
         if (type == 0) {
             printf("Type: Controlled packet\n", type);
-            
-            uint16_t src;
-            memcpy(&src, buffer+sizeof(type), sizeof(src));
-            printf("Src: %d\n", src);
-            
-            uint16_t dest;
-            memcpy(&dest, buffer+sizeof(type)+sizeof(src), sizeof(dest));
-            printf("Dest: %d\n", dest);
-            
-            // Create temporary copy of table
+
             uint8_t temp_table[NUMROUTERS][NUMROUTERS];
-            memcpy(temp_table, table, sizeof(temp_table));
+            memcpy(&temp_table, buffer+1, NUMROUTERS*NUMROUTERS);
+
+            printf("Temp Table array elements:\n");
+            for(int i=0; i<3; i++) {
+                for(int j=0;j<3;j++) {
+                    printf("(%d, %d) ", router_num, temp_table[i][j]);
+                    if(j==2){
+                        printf("\n");
+                    }
+                }
+            }
+            printf("\n");
             
             // Send packet
             sendPacketToNeighbors(router_num, table);
@@ -149,18 +151,7 @@ unsigned char* makeControlPacket(uint8_t data[NUMROUTERS][NUMROUTERS]) {
 
     // copy packet type and data into packet
     memcpy(result, &type, sizeof(type));
-
-    int counter = 0;
-
-    for(int row=0; row<NUMROUTERS; row++)
-    {
-        for(int col=0; col<NUMROUTERS; col++)
-        {
-            uint8_t temp = data[row][col];
-            memcpy(result+1+counter, &temp, 1);
-            counter++;
-        }
-    }
+    memcpy(result+1, &data, NUMROUTERS*NUMROUTERS);
 
     return(result);
 }

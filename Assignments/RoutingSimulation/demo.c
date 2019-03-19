@@ -12,6 +12,12 @@ int main() {
         printf("Enter the destination router: ");
         scanf("%d", &dest);
 
+        uint8_t table[NUMROUTERS][NUMROUTERS];
+        for (int i = 0; i < NUMROUTERS; i++) {
+            for (int j = 0; j < NUMROUTERS; j++) {
+                table[i][j] = 12;
+            }
+        }
 
         // set up port and send
         int sockfd; 
@@ -45,7 +51,8 @@ int main() {
         memcpy(&servaddr.sin_addr.s_addr, server->h_addr, server->h_length);
 
         //Make packet to send
-        unsigned char* packet = makePacket(src, dest, "Hello World");
+        // unsigned char* packet = makePacket(src, dest, "Hello World");
+        unsigned char* packet = makeControlPacket(table);
 
         // Send packet over socket
         sendto(sockfd, (const char *)packet, MAXLINE, 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
@@ -62,6 +69,19 @@ unsigned char* makePacket(uint16_t src, uint16_t dest, unsigned char* data) {
     memcpy(result+sizeof(type), &src, sizeof(src));
     memcpy(result+sizeof(type)+sizeof(src), &dest, sizeof(dest));
     memcpy(result+sizeof(type)+sizeof(src)+sizeof(dest), data, strlen(data));
+
+    return(result);
+}
+
+// helper function to make control packet
+unsigned char* makeControlPacket(uint8_t data[NUMROUTERS][NUMROUTERS]) {
+    uint8_t type = 0;
+    size_t s = 1+(NUMROUTERS*NUMROUTERS);
+    unsigned char* result = (char*)malloc(s);
+
+    // copy packet type and data into packet
+    memcpy(result, &type, sizeof(type));
+    memcpy(result+1, &data, NUMROUTERS*NUMROUTERS);
 
     return(result);
 }
