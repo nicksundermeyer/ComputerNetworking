@@ -12,13 +12,6 @@ int main() {
         printf("Enter the destination router: ");
         scanf("%d", &dest);
 
-        uint8_t table[NUMROUTERS][NUMROUTERS];
-        for (int i = 0; i < NUMROUTERS; i++) {
-            for (int j = 0; j < NUMROUTERS; j++) {
-                table[i][j] = 12;
-            }
-        }
-
         // set up port and send
         int sockfd; 
         unsigned char buffer[MAXLINE]; 
@@ -51,8 +44,7 @@ int main() {
         memcpy(&servaddr.sin_addr.s_addr, server->h_addr, server->h_length);
 
         //Make packet to send
-        // unsigned char* packet = makePacket(src, dest, "Hello World");
-        unsigned char* packet = makeControlPacket(table);
+        unsigned char* packet = makePacket(src, dest, "Hello World");
 
         // Send packet over socket
         sendto(sockfd, (const char *)packet, MAXLINE, 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
