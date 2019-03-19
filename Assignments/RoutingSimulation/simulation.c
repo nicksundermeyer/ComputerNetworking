@@ -88,6 +88,8 @@ void createRouter(char* router_name, int router_num) {
     }
     printf("bound to: %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
     
+    sendPacketToNeighbors(router_num, table);
+    
     // loop to wait for packets
     while(1)
     {
@@ -105,17 +107,20 @@ void createRouter(char* router_name, int router_num) {
         if (type == 0) {
             printf("Type: Controlled packet\n", type);
             
+            uint16_t src;
+            memcpy(&src, buffer+sizeof(type), sizeof(src));
+            printf("Src: %d\n", src);
+            
+            uint16_t dest;
+            memcpy(&dest, buffer+sizeof(type)+sizeof(src), sizeof(dest));
+            printf("Dest: %d\n", dest);
+            
             // Create temporary copy of table
             uint8_t temp_table[NUMROUTERS][NUMROUTERS];
             memcpy(temp_table, table, sizeof(temp_table));
             
-            for (int i = 0; i < NUMROUTERS; i++) {
-                if (table[router_num][i] != 0 && table[router_num][i] != 255) {
-                    // Send out packet
-                    unsigned char* packet = makeControlPacket(table);
-                }
-            }
-            
+            // Send packet
+            sendPacketToNeighbors(router_num, table);
         }
         else if (type == 1) {
             printf("Type: Basic packet\n", type);
@@ -192,6 +197,17 @@ void sendToSocket(uint8_t dest, unsigned char* packet)
 
         // Send packet over socket
         sendto(sockfd, (const char *)packet, 1+(NUMROUTERS*NUMROUTERS), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
+}
+
+void sendPacketToNeighbors(int router_num, uint8_t table[NUMROUTERS][NUMROUTERS]) {
+    for (int i = 0; i < NUMROUTERS; i++) {
+        if (table[router_num][i] != 0 && table[router_num][i] != 255) {
+            // Send out packet
+            uint8_t dest = i;
+            unsigned char* packet = makeControlPacket(table);
+            sendToSocket(dest, packet);
+        }
+    }
 }
 
 // helper function to print out bits
