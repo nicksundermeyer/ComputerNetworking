@@ -150,11 +150,15 @@ unsigned char* makeControlPacket(uint8_t data[NUMROUTERS][NUMROUTERS]) {
     // copy packet type and data into packet
     memcpy(result, &type, sizeof(type));
 
+    int counter = 0;
+
     for(int row=0; row<NUMROUTERS; row++)
     {
         for(int col=0; col<NUMROUTERS; col++)
         {
-            memcpy(result+1+((row*col)*sizeof(uint8_t)), &data[row][col], sizeof(uint8_t));
+            uint8_t temp = data[row][col];
+            memcpy(result+1+counter, &temp, 1);
+            counter++;
         }
     }
 
@@ -208,6 +212,16 @@ void sendPacketToNeighbors(int router_num, uint8_t table[NUMROUTERS][NUMROUTERS]
             sendToSocket(dest, packet);
         }
     }
+}
+
+// helper function to print packet out as uint8_ts
+void print_numbers(char* buf, size_t size_in_bytes)
+{
+    for(int i=0; i<size_in_bytes; i++)
+    {
+        printf("%d ", buf[i]);
+    }
+    printf("\n");
 }
 
 // helper function to print out bits

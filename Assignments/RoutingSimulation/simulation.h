@@ -22,6 +22,7 @@ void createRouter(char* router_name, int router_num);
 unsigned char* makeControlPacket(uint8_t data[NUMROUTERS][NUMROUTERS]);
 void sendToSocket(uint8_t dest, unsigned char* packet);
 void sendPacketToNeighbors(int router_num, uint8_t table[NUMROUTERS][NUMROUTERS]);
+void print_numbers(char* buf, size_t size_in_bytes);
 void print_bits ( void* buf, size_t size_in_bytes );
 
 #endif /* simulation_h */
