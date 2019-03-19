@@ -22,7 +22,7 @@ void createRouter(char* router_name, int router_num) {
     uint8_t table[NUMROUTERS][NUMROUTERS];
     for (int i = 0; i < NUMROUTERS; i++) {
         for (int j = 0; j < NUMROUTERS; j++) {
-            table[i][j] = -1;
+            table[i][j] = 255;
         }
     }
     
@@ -110,19 +110,36 @@ void createRouter(char* router_name, int router_num) {
             uint8_t temp_table[NUMROUTERS][NUMROUTERS];
             memcpy(&temp_table, buffer+1, NUMROUTERS*NUMROUTERS);
 
-            printf("Temp Table array elements:\n");
-            for(int i=0; i<3; i++) {
-                for(int j=0;j<3;j++) {
-                    printf("(%d, %d) ", router_num, temp_table[i][j]);
-                    if(j==2){
-                        printf("\n");
+            bool checkEqual = true;
+            for (int i = 0; i < NUMROUTERS; i++) {
+                for (int j = 0; j < NUMROUTERS; j++) {
+                    if (table[i][j] != temp_table[i][j]) {
+                        checkEqual = false;
                     }
                 }
             }
-            printf("\n");
             
-            // Send packet
-            sendPacketToNeighbors(router_num, table);
+            if (!checkEqual) { // Send packets until all tables at each router are equal
+                sendPacketToNeighbors(router_num, table);
+            }
+            else {
+                int minValue = 255;
+                for (int i = 0; i < NUMROUTERS; i++) {
+                    if (table[router_num][i] != 0 && table[router_num][i] != 255) {
+                        // for each neighbor
+                            // if the distance to that neighbor plus its distance to destination is less than table[router_num][i]...
+                        for (int j = 0; j < NUMROUTERS; j++) {
+                            if (table[router_num][j] != 0 && table[router_num][j] != 255) {
+                                if (table[router_num][i] > table[i][j] + table[j][i]) {
+                                    minValue = table[i][j] + table[j][i];
+                                    table[i][j] = minValue;
+                                }
+                            }
+                        }
+                    }
+                }
+                sendPacketToNeighbors(router_num, table);
+            }
         }
         else if (type == 1) {
             printf("Type: Basic packet\n", type);
