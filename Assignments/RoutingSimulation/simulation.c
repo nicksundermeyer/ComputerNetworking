@@ -128,7 +128,7 @@ unsigned char* makeControlPacket(uint8_t data[NUMROUTERS][NUMROUTERS]) {
     {
         for(int col=0; col<NUMROUTERS; col++)
         {
-            memcpy(result+((row*col)*sizeof(uint8_t)), &result, sizeof(uint8_t));
+            memcpy(result+((row*col)*sizeof(uint8_t)), &data[row][col], sizeof(uint8_t));
         }
     }
 
