@@ -47,13 +47,13 @@ void createRouter(char* router_name, int router_num) {
         printf("ERROR: Incorrect file format for router configuration.\n");
         exit(1);
     }
-    int neighbors[fSize];
+    char* neighbors = (char*) malloc(fSize);
     size_t read_data = fread(neighbors, 1, fSize, fIn);
     printf("Created router %d with %d neighbors.\n", router_num, fSize);
     
     // fill initial row of table
     for (int i = 0; i < NUMROUTERS; i++) {
-        table[router_num][i] = neighbors[i];
+        table[router_num][i] = neighbors[i] - '0';
     }
     printf("Two Dimensional array elements:\n");
     for(int i=0; i<3; i++) {
