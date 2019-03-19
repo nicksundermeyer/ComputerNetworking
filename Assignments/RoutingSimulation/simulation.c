@@ -148,16 +148,13 @@ unsigned char* makeControlPacket(uint8_t data[NUMROUTERS][NUMROUTERS]) {
     unsigned char* result = (char*)malloc(s);
 
     // copy packet type and data into packet
-    print_bits(result, 1+(NUMROUTERS+NUMROUTERS));
     memcpy(result, &type, sizeof(type));
-    print_bits(result, 1+(NUMROUTERS+NUMROUTERS));
 
     for(int row=0; row<NUMROUTERS; row++)
     {
         for(int col=0; col<NUMROUTERS; col++)
         {
             memcpy(result+1+((row*col)*sizeof(uint8_t)), &data[row][col], sizeof(uint8_t));
-            print_bits(result, 1+(NUMROUTERS+NUMROUTERS));
         }
     }
 
