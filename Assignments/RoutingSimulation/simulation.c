@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
 
 void createRouter(char* router_name, int router_num) {
     // create table for BF & fill with -1
-    int table[NUMROUTERS][NUMROUTERS];
+    uint8_t table[NUMROUTERS][NUMROUTERS];
     for (int i = 0; i < NUMROUTERS; i++) {
         for (int j = 0; j < NUMROUTERS; j++) {
             table[i][j] = -1;
@@ -62,56 +62,77 @@ void createRouter(char* router_name, int router_num) {
     
     // setup socket
     int sockfd;
-
+    
     unsigned char* buffer = (char*)malloc(MAXLINE);
-    struct sockaddr_in servaddr, cliaddr; 
-
-    // Creating socket file descriptor 
-    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
-        perror("socket creation failed"); 
+    struct sockaddr_in servaddr, cliaddr;
+    
+    // Creating socket file descriptor
+    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
+        perror("socket creation failed");
         exit(EXIT_FAILURE);
-    } 
-
-    memset(&servaddr, 0, sizeof(servaddr)); 
-    memset(&cliaddr, 0, sizeof(cliaddr)); 
-
+    }
+    
+    memset(&servaddr, 0, sizeof(servaddr));
+    memset(&cliaddr, 0, sizeof(cliaddr));
+    
     // Filling server information
     // The given port on this computer
-    servaddr.sin_family = AF_INET; // IPv4 
-    servaddr.sin_addr.s_addr = INADDR_ANY; 
-    servaddr.sin_port = htons(PORT+omp_get_thread_num()); 
-
-    // Bind the socket with the server address 
-    if ( bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0 ) { 
-        perror("bind failed"); 
-        exit(EXIT_FAILURE); 
-    } 
+    servaddr.sin_family = AF_INET; // IPv4
+    servaddr.sin_addr.s_addr = INADDR_ANY;
+    servaddr.sin_port = htons(PORT+omp_get_thread_num());
+    
+    // Bind the socket with the server address
+    if ( bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0 ) {
+        perror("bind failed");
+        exit(EXIT_FAILURE);
+    }
     printf("bound to: %x: %d\n", servaddr.sin_addr.s_addr, servaddr.sin_port);
-
+    
     // loop to wait for packets
     while(1)
     {
-        printf("Server ready\n");
-
+        printf("Router ready\n");
+        
         unsigned int len = sizeof(cliaddr);
         int n = recvfrom(sockfd, (unsigned char *)buffer, MAXLINE, 0, (struct sockaddr *) &cliaddr, &len);
-
+        
         char buf[MAXLINE];
         memcpy(&buf, buffer, MAXLINE);
-
+        
         uint8_t type;
         memcpy(&type, buffer, sizeof(type));
-        printf("Type: %d\n", type);
-
-        uint16_t src;
-        memcpy(&src, buffer+sizeof(type), sizeof(src));
-        printf("Src: %d\n", src);
-
-        uint16_t dest;
-        memcpy(&dest, buffer+sizeof(type)+sizeof(src), sizeof(dest));
-        printf("Dest: %d\n", dest);
-
-        makeControlPacket(table);
+        
+        if (type == 0) {
+            printf("Type: Controlled packet\n", type);
+            
+            // Create temporary copy of table
+            uint8_t temp_table[NUMROUTERS][NUMROUTERS];
+            memcpy(temp_table, table, sizeof(temp_table));
+            
+            for (int i = 0; i < NUMROUTERS; i++) {
+                if (table[router_num][i] != 0 && table[router_num][i] != 255) {
+                    // Send out packet
+                    makeControlPacket(table);
+                }
+            }
+            
+        }
+        else if (type == 1) {
+            printf("Type: Basic packet\n", type);
+            
+            uint16_t src;
+            memcpy(&src, buffer+sizeof(type), sizeof(src));
+            printf("Src: %d\n", src);
+            
+            uint16_t dest;
+            memcpy(&dest, buffer+sizeof(type)+sizeof(src), sizeof(dest));
+            printf("Dest: %d\n", dest);
+        }
+        else {
+            printf("Invalid packet type\n");
+        }
+        
+        // print_bits(buf, MAXLINE);
     }
 }
 
