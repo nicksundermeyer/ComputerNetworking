@@ -1,10 +1,5 @@
 #include "simulation.h"
 
-#define PORT 7000
-#define MAXLINE 20
-int NUMROUTERS;
-char* ROOTNAME;
-
 int main(int argc, char** argv) {
     if(argc>1)
     {
@@ -116,8 +111,28 @@ void createRouter(char* router_name, int router_num) {
         memcpy(&dest, buffer+sizeof(type)+sizeof(src), sizeof(dest));
         printf("Dest: %d\n", dest);
 
-        // print_bits(buf, MAXLINE);
+        makeControlPacket(table);
     }
+}
+
+// helper function to make control packet
+unsigned char* makeControlPacket(uint8_t data[NUMROUTERS][NUMROUTERS]) {
+    uint8_t type = 0;
+    size_t s = 1+(NUMROUTERS*NUMROUTERS);
+    unsigned char* result = (char*)malloc(s);
+
+    // copy packet type and data into packet
+    memcpy(result, &type, sizeof(type));
+
+    for(int row=0; row<NUMROUTERS; row++)
+    {
+        for(int col=0; col<NUMROUTERS; col++)
+        {
+            memcpy(result+((row*col)*sizeof(uint8_t)), &result, sizeof(uint8_t));
+        }
+    }
+
+    return(result);
 }
 
 // helper function to print out bits
