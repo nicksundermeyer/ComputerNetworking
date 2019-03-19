@@ -110,11 +110,11 @@ void createRouter(char* router_name, int router_num) {
             uint8_t temp_table[NUMROUTERS][NUMROUTERS];
             memcpy(&temp_table, buffer+1, NUMROUTERS*NUMROUTERS);
 
-            bool checkEqual = true;
+            int checkEqual = 0;
             for (int i = 0; i < NUMROUTERS; i++) {
                 for (int j = 0; j < NUMROUTERS; j++) {
                     if (table[i][j] != temp_table[i][j]) {
-                        checkEqual = false;
+                        checkEqual = 1;
                     }
                 }
             }
