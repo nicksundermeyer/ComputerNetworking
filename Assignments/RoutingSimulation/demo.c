@@ -1,6 +1,6 @@
 #include "demo.h"
 
-#define PORT 7000
+#define PORT 8000
 #define MAXLINE 20
 
 int main() {
@@ -11,6 +11,13 @@ int main() {
         scanf("%d", &src);
         printf("Enter the destination router: ");
         scanf("%d", &dest);
+
+        uint8_t table[NUMROUTERS][NUMROUTERS];
+        for (int i = 0; i < NUMROUTERS; i++) {
+            for (int j = 0; j < NUMROUTERS; j++) {
+                table[i][j] = 35;
+            }
+        }
 
         // set up port and send
         int sockfd; 
@@ -44,7 +51,8 @@ int main() {
         memcpy(&servaddr.sin_addr.s_addr, server->h_addr, server->h_length);
 
         //Make packet to send
-        unsigned char* packet = makePacket(src, dest, "Hello World");
+        // unsigned char* packet = makePacket(src, dest, "Hello World");
+        unsigned char* packet = makeControlPacket(table);
 
         // Send packet over socket
         sendto(sockfd, (const char *)packet, MAXLINE, 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
@@ -67,15 +75,28 @@ unsigned char* makePacket(uint16_t src, uint16_t dest, unsigned char* data) {
 
 // helper function to make control packet
 unsigned char* makeControlPacket(uint8_t data[NUMROUTERS][NUMROUTERS]) {
-    uint8_t type = 0;
+    // uint8_t type = 0;
     size_t s = 1+(NUMROUTERS*NUMROUTERS);
     unsigned char* result = (char*)malloc(s);
 
-    // copy packet type and data into packet
-    memcpy(result, &type, sizeof(type));
-    memcpy(result+1, &data, NUMROUTERS*NUMROUTERS);
+    int count = 1;
+    result[0] = 0;
+    for(int i=0; i<NUMROUTERS; i++)
+    {
+        for(int j=0; j<NUMROUTERS; j++)
+        {
+            result[count] = data[i][j];
+            count++;
+        }
+    }
 
-    return(result);
+    return result;
+
+    // // copy packet type and data into packet
+    // memcpy(result, &type, sizeof(type));
+    // memcpy(result+1, &data, NUMROUTERS*NUMROUTERS);
+
+    // return(result);
 }
 
 // helper function to print out bits

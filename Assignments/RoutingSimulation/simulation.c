@@ -7,7 +7,7 @@ int main(int argc, char** argv) {
         ROOTNAME = argv[2];
     }
 
-    omp_set_num_threads(NUMROUTERS);
+    omp_set_num_threads(1);
 #pragma omp parallel
     {
         char routername[16];
@@ -100,6 +100,14 @@ void createRouter(char* router_name, int router_num) {
         
         char buf[MAXLINE];
         memcpy(&buf, buffer, MAXLINE);
+
+        printf("\nbuf[0]: %d\n", buf[0]);
+
+        for(int i=0; i<(NUMROUTERS*NUMROUTERS)+1; i++)
+        {
+            printf("%i ", buf[i]);
+        }
+        printf("\n");
         
         uint8_t type;
         memcpy(&type, buffer, sizeof(type));
@@ -110,36 +118,36 @@ void createRouter(char* router_name, int router_num) {
             uint8_t temp_table[NUMROUTERS][NUMROUTERS];
             memcpy(&temp_table, buffer+1, NUMROUTERS*NUMROUTERS);
 
-            int checkEqual = 0; // test to see if table already have and received are the same, if they are then stop sending packets
-            for (int i = 0; i < NUMROUTERS; i++) {
-                for (int j = 0; j < NUMROUTERS; j++) {
-                    if (table[i][j] != temp_table[i][j]) {
-                        checkEqual = 1;
-                    }
-                }
-            }
+            // int checkEqual = 0; // test to see if table already have and received are the same, if they are then stop sending packets
+            // for (int i = 0; i < NUMROUTERS; i++) {
+            //     for (int j = 0; j < NUMROUTERS; j++) {
+            //         if (table[i][j] != temp_table[i][j]) {
+            //             checkEqual = 1;
+            //         }
+            //     }
+            // }
             
-            if (!checkEqual) { // Send packets until all tables at each router are equal
-                sendPacketToNeighbors(router_num, table);
-            }
-            else { // implementation of bellman-ford equation
-                int minValue = 255;
-                for (int i = 0; i < NUMROUTERS; i++) {
-                    if (table[router_num][i] != 0 && table[router_num][i] != 255) {
-                        // for each neighbor
-                            // if the distance to that neighbor plus its distance to destination is less than table[router_num][i]...
-                        for (int j = 0; j < NUMROUTERS; j++) {
-                            if (table[router_num][j] != 0 && table[router_num][j] != 255) {
-                                if (table[router_num][i] > table[i][j] + table[j][i]) {
-                                    minValue = table[i][j] + table[j][i];
-                                    table[i][j] = minValue;
-                                }
-                            }
-                        }
-                    }
-                }
-                sendPacketToNeighbors(router_num, table);
-            }
+            // if (!checkEqual) { // Send packets until all tables at each router are equal
+            //     sendPacketToNeighbors(router_num, table);
+            // }
+            // else { // implementation of bellman-ford equation
+            //     int minValue = 255;
+            //     for (int i = 0; i < NUMROUTERS; i++) {
+            //         if (table[router_num][i] != 0 && table[router_num][i] != 255) {
+            //             // for each neighbor
+            //                 // if the distance to that neighbor plus its distance to destination is less than table[router_num][i]...
+            //             for (int j = 0; j < NUMROUTERS; j++) {
+            //                 if (table[router_num][j] != 0 && table[router_num][j] != 255) {
+            //                     if (table[router_num][i] > table[i][j] + table[j][i]) {
+            //                         minValue = table[i][j] + table[j][i];
+            //                         table[i][j] = minValue;
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            //     sendPacketToNeighbors(router_num, table);
+            // }
         }
         else if (type == 1) {
             printf("Type: Basic packet\n", type);
@@ -162,15 +170,28 @@ void createRouter(char* router_name, int router_num) {
 
 // helper function to make control packet
 unsigned char* makeControlPacket(uint8_t data[NUMROUTERS][NUMROUTERS]) {
-    uint8_t type = 0;
+    // uint8_t type = 0;
     size_t s = 1+(NUMROUTERS*NUMROUTERS);
     unsigned char* result = (char*)malloc(s);
 
-    // copy packet type and data into packet
-    memcpy(result, &type, sizeof(type));
-    memcpy(result+1, &data, NUMROUTERS*NUMROUTERS);
+    int count = 1;
+    result[0] = 0;
+    for(int i=0; i<NUMROUTERS; i++)
+    {
+        for(int j=0; j<NUMROUTERS; j++)
+        {
+            result[count] = data[i][j];
+            count++;
+        }
+    }
 
-    return(result);
+    return result;
+
+    // // copy packet type and data into packet
+    // memcpy(result, &type, sizeof(type));
+    // memcpy(result+1, &data, NUMROUTERS*NUMROUTERS);
+
+    // return(result);
 }
 
 // helper function to send data to socket

@@ -13,7 +13,7 @@
 #include <netdb.h>
 #include <omp.h>
 
-#define PORT 7000
+#define PORT 8000
 #define MAXLINE 20
 int NUMROUTERS;
 char* ROOTNAME;
