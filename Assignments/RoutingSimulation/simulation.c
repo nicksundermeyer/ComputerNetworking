@@ -112,7 +112,7 @@ void createRouter(char* router_name, int router_num) {
             for (int i = 0; i < NUMROUTERS; i++) {
                 if (table[router_num][i] != 0 && table[router_num][i] != 255) {
                     // Send out packet
-                    makeControlPacket(table);
+                    unsigned char* packet = makeControlPacket(table);
                 }
             }
             
@@ -154,6 +154,44 @@ unsigned char* makeControlPacket(uint8_t data[NUMROUTERS][NUMROUTERS]) {
     }
 
     return(result);
+}
+
+// helper function to send data to socket
+void sendToSocket(unsigned char* packet)
+{
+    // set up port and send
+        int sockfd; 
+        unsigned char buffer[1+(NUMROUTERS*NUMROUTERS)]; 
+        struct sockaddr_in servaddr;
+
+        // setup socket
+        
+        // Creating socket file descriptor
+        // Last parameter could be IPPROTO_UDP but that is what it will pick anyway with 0
+        if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+            perror("socket creation failed"); 
+            exit(EXIT_FAILURE); 
+        } 
+
+        memset(&servaddr, 0, sizeof(servaddr));   // dest, src, size
+        
+        // Filling server information 
+        servaddr.sin_family = AF_INET; 
+        servaddr.sin_port = htons(PORT+omp_get_thread_num()); 
+
+        // Setup the server host address
+        unsigned char* host = "localhost";
+
+        struct hostent *server;
+        server = gethostbyname(host);
+        if (server == NULL) {
+            fprintf(stderr,"ERROR, no such host\n");
+            exit(0);
+        }
+        memcpy(&servaddr.sin_addr.s_addr, server->h_addr, server->h_length);
+
+        // Send packet over socket
+        sendto(sockfd, (const char *)packet, 1+(NUMROUTERS*NUMROUTERS), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
 }
 
 // helper function to print out bits
