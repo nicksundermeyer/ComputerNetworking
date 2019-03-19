@@ -7,7 +7,8 @@ int main(int argc, char** argv) {
         ROOTNAME = argv[2];
     }
 
-    omp_set_num_threads(1);
+    // starting up routers on threads in parallel
+    omp_set_num_threads(NUMROUTERS);
 #pragma omp parallel
     {
         char routername[16];
@@ -17,7 +18,9 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+// function to simulate a router
 void createRouter(char* router_name, int router_num) {
+
     // create table for BF & fill with -1
     uint8_t table[NUMROUTERS][NUMROUTERS];
     for (int i = 0; i < NUMROUTERS; i++) {
@@ -50,15 +53,6 @@ void createRouter(char* router_name, int router_num) {
     for (int i = 0; i < NUMROUTERS; i++) {
         table[router_num][i] = neighbors[i] - '0';
     }
-//    printf("Two Dimensional array elements:\n");
-//    for(int i=0; i<3; i++) {
-//        for(int j=0;j<3;j++) {
-//            printf("(%d, %d) ", router_num, table[i][j]);
-//            if(j==2){
-//                printf("\n");
-//            }
-//        }
-//    }
     
     // setup socket
     int sockfd;
@@ -98,57 +92,60 @@ void createRouter(char* router_name, int router_num) {
         unsigned int len = sizeof(cliaddr);
         int n = recvfrom(sockfd, (unsigned char *)buffer, MAXLINE, 0, (struct sockaddr *) &cliaddr, &len);
         
+        // receive and copy to buffer
         char buf[MAXLINE];
         memcpy(&buf, buffer, MAXLINE);
 
-        printf("\nbuf[0]: %d\n", buf[0]);
+        // printf("\nbuf[0]: %d\n", buf[0]);
 
-        for(int i=0; i<(NUMROUTERS*NUMROUTERS)+1; i++)
-        {
-            printf("%i ", buf[i]);
-        }
-        printf("\n");
+        // for(int i=0; i<(NUMROUTERS*NUMROUTERS)+1; i++)
+        // {
+        //     printf("%i ", buf[i]);
+        // }
+        // printf("\n");
         
         uint8_t type;
         memcpy(&type, buffer, sizeof(type));
         
+        // if a control packet, then recalculate table and send to neighbors
         if (type == 0) {
-            printf("Type: Controlled packet\n", type);
+            printf("Type: Control packet\n", type);
 
             uint8_t temp_table[NUMROUTERS][NUMROUTERS];
             memcpy(&temp_table, buffer+1, NUMROUTERS*NUMROUTERS);
 
-            // int checkEqual = 0; // test to see if table already have and received are the same, if they are then stop sending packets
-            // for (int i = 0; i < NUMROUTERS; i++) {
-            //     for (int j = 0; j < NUMROUTERS; j++) {
-            //         if (table[i][j] != temp_table[i][j]) {
-            //             checkEqual = 1;
-            //         }
-            //     }
-            // }
+            int checkEqual = 0; // test to see if table already have and received are the same, if they are then stop sending packets
+            for (int i = 0; i < NUMROUTERS; i++) {
+                for (int j = 0; j < NUMROUTERS; j++) {
+                    if (table[i][j] != temp_table[i][j]) {
+                        checkEqual = 1;
+                    }
+                }
+            }
             
-            // if (!checkEqual) { // Send packets until all tables at each router are equal
-            //     sendPacketToNeighbors(router_num, table);
-            // }
-            // else { // implementation of bellman-ford equation
-            //     int minValue = 255;
-            //     for (int i = 0; i < NUMROUTERS; i++) {
-            //         if (table[router_num][i] != 0 && table[router_num][i] != 255) {
-            //             // for each neighbor
-            //                 // if the distance to that neighbor plus its distance to destination is less than table[router_num][i]...
-            //             for (int j = 0; j < NUMROUTERS; j++) {
-            //                 if (table[router_num][j] != 0 && table[router_num][j] != 255) {
-            //                     if (table[router_num][i] > table[i][j] + table[j][i]) {
-            //                         minValue = table[i][j] + table[j][i];
-            //                         table[i][j] = minValue;
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     }
-            //     sendPacketToNeighbors(router_num, table);
-            // }
+            if (!checkEqual) { // Send packets until all tables at each router are equal
+                sendPacketToNeighbors(router_num, table);
+            }
+            else { // implementation of bellman-ford equation
+                int minValue = 255;
+                for (int i = 0; i < NUMROUTERS; i++) {
+                    if (table[router_num][i] != 0 && table[router_num][i] != 255) {
+                        // for each neighbor
+                            // if the distance to that neighbor plus its distance to destination is less than table[router_num][i]...
+                        for (int j = 0; j < NUMROUTERS; j++) {
+                            if (table[router_num][j] != 0 && table[router_num][j] != 255) {
+                                if (table[router_num][i] > table[i][j] + table[j][i]) {
+                                    minValue = table[i][j] + table[j][i];
+                                    table[i][j] = minValue;
+                                }
+                            }
+                        }
+                    }
+                }
+                sendPacketToNeighbors(router_num, table);
+            }
         }
+        // otherwise it's a basic packet, save the data to variables and print
         else if (type == 1) {
             printf("Type: Basic packet\n", type);
             
@@ -174,6 +171,7 @@ unsigned char* makeControlPacket(uint8_t data[NUMROUTERS][NUMROUTERS]) {
     size_t s = 1+(NUMROUTERS*NUMROUTERS);
     unsigned char* result = (char*)malloc(s);
 
+    // flatten table data into single char*
     int count = 1;
     result[0] = 0;
     for(int i=0; i<NUMROUTERS; i++)
@@ -186,52 +184,47 @@ unsigned char* makeControlPacket(uint8_t data[NUMROUTERS][NUMROUTERS]) {
     }
 
     return result;
-
-    // // copy packet type and data into packet
-    // memcpy(result, &type, sizeof(type));
-    // memcpy(result+1, &data, NUMROUTERS*NUMROUTERS);
-
-    // return(result);
 }
 
 // helper function to send data to socket
 void sendToSocket(uint8_t dest, unsigned char* packet)
 {
     // set up port and send
-        int sockfd; 
-        unsigned char buffer[1+(NUMROUTERS*NUMROUTERS)]; 
-        struct sockaddr_in servaddr;
+    int sockfd; 
+    unsigned char buffer[1+(NUMROUTERS*NUMROUTERS)]; 
+    struct sockaddr_in servaddr;
 
-        // setup socket
-        
-        // Creating socket file descriptor
-        // Last parameter could be IPPROTO_UDP but that is what it will pick anyway with 0
-        if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
-            perror("socket creation failed"); 
-            exit(EXIT_FAILURE); 
-        } 
+    // setup socket
+    
+    // Creating socket file descriptor
+    // Last parameter could be IPPROTO_UDP but that is what it will pick anyway with 0
+    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+        perror("socket creation failed"); 
+        exit(EXIT_FAILURE); 
+    } 
 
-        memset(&servaddr, 0, sizeof(servaddr));   // dest, src, size
-        
-        // Filling server information 
-        servaddr.sin_family = AF_INET; 
-        servaddr.sin_port = htons(PORT+dest); 
+    memset(&servaddr, 0, sizeof(servaddr));   // dest, src, size
+    
+    // Filling server information 
+    servaddr.sin_family = AF_INET; 
+    servaddr.sin_port = htons(PORT+dest); 
 
-        // Setup the server host address
-        unsigned char* host = "localhost";
+    // Setup the server host address
+    unsigned char* host = "localhost";
 
-        struct hostent *server;
-        server = gethostbyname(host);
-        if (server == NULL) {
-            fprintf(stderr,"ERROR, no such host\n");
-            exit(0);
-        }
-        memcpy(&servaddr.sin_addr.s_addr, server->h_addr, server->h_length);
+    struct hostent *server;
+    server = gethostbyname(host);
+    if (server == NULL) {
+        fprintf(stderr,"ERROR, no such host\n");
+        exit(0);
+    }
+    memcpy(&servaddr.sin_addr.s_addr, server->h_addr, server->h_length);
 
-        // Send packet over socket
-        sendto(sockfd, (const char *)packet, 1+(NUMROUTERS*NUMROUTERS), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
+    // Send packet over socket
+    sendto(sockfd, (const char *)packet, 1+(NUMROUTERS*NUMROUTERS), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
 }
 
+// helper function to send new control packet to neighbor routers
 void sendPacketToNeighbors(int router_num, uint8_t table[NUMROUTERS][NUMROUTERS]) {
     for (int i = 0; i < NUMROUTERS; i++) {
         if (table[router_num][i] != 0 && table[router_num][i] != 255) {
